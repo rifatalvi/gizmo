@@ -53,10 +53,19 @@ export default function LoginPage() {
         setError("");
         setLoading(true);
         try {
-            await signIn.email({ email, password });
-            router.push("/");
+            const result = await signIn.email({ email, password });
+            if (result.error) {
+                setError(result.error.message || "Invalid email or password. Please try again.");
+            } else {
+                const role = result.data?.user?.role;
+                if (role === "admin") {
+                    router.push("/dashboard/admin");
+                } else {
+                    router.push("/dashboard/user");
+                }
+            }
         } catch (err: unknown) {
-            setError(err instanceof Error ? err.message : "Invalid email or password. Please try again.");
+            setError(err instanceof Error ? err.message : "An unexpected error occurred. Please try again.");
         } finally {
             setLoading(false);
         }

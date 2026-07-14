@@ -14,6 +14,7 @@ const geistMono = Geist_Mono({
 });
 
 import { ThemeProvider } from "@/component/ThemeProvider";
+import { TooltipProvider } from "@/components/ui/tooltip";
 
 export const metadata: Metadata = {
   title: "Gizmo — Tech E-Commerce",
@@ -33,8 +34,10 @@ export default function RootLayout({
     >
       <body className="min-h-full flex flex-col bg-slate-50 dark:bg-[#0a0a0f] text-slate-900 dark:text-white transition-colors duration-300">
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
-          <Navbar />
-          {children}
+          <TooltipProvider>
+            <Navbar />
+            {children}
+          </TooltipProvider>
         </ThemeProvider>
       </body>
     </html>
