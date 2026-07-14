@@ -6,59 +6,22 @@ import { useEffect, useState, useRef } from "react";
 
 const TYPING_WORDS = ["Delivered fast.", "At best prices.", "With top brands.", "All in one place."];
 
-// Showcase slides for hero right panel
 const SLIDES = [
     {
-        label: "🔥 Hot Deal",
-        name: "Sony WH-1000XM5",
-        category: "Audio",
-        price: "$279",
-        originalPrice: "$399",
-        discount: "30% OFF",
-        rating: "4.9",
-        reviews: "2.4k",
-        color: "from-violet-500/20 to-purple-600/10",
-        iconBg: "bg-violet-500",
-        icon: "M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3",
+        src: "https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=600&q=80",
+        alt: "MacBook Pro on a desk",
     },
     {
-        label: "⭐ Top Rated",
-        name: "MacBook Pro M4",
-        category: "Laptops",
-        price: "$1,799",
-        originalPrice: "$1,999",
-        discount: "10% OFF",
-        rating: "5.0",
-        reviews: "8.1k",
-        color: "from-blue-500/20 to-cyan-600/10",
-        iconBg: "bg-blue-500",
-        icon: "M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z",
+        src: "https://images.unsplash.com/photo-1585386959984-a4155224a1ad?w=600&q=80",
+        alt: "Sony headphones",
     },
     {
-        label: "🆕 New Arrival",
-        name: "Samsung Galaxy S25 Ultra",
-        category: "Phones",
-        price: "$1,199",
-        originalPrice: "$1,299",
-        discount: "8% OFF",
-        rating: "4.8",
-        reviews: "5.2k",
-        color: "from-emerald-500/20 to-green-600/10",
-        iconBg: "bg-emerald-500",
-        icon: "M17 2H7a2 2 0 00-2 2v16a2 2 0 002 2h10a2 2 0 002-2V4a2 2 0 00-2-2zm-5 18a1 1 0 110-2 1 1 0 010 2z",
+        src: "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=600&q=80",
+        alt: "Modern smartphone",
     },
     {
-        label: "🎮 Best Seller",
-        name: "ASUS ROG Zephyrus G16",
-        category: "Gaming",
-        price: "$2,199",
-        originalPrice: "$2,599",
-        discount: "15% OFF",
-        rating: "4.9",
-        reviews: "3.7k",
-        color: "from-rose-500/20 to-red-600/10",
-        iconBg: "bg-rose-500",
-        icon: "M6 11l6-9 6 9M3.5 16a4.5 4.5 0 009 0M11.5 16a4.5 4.5 0 009 0M8 16h.01M16 16h.01",
+        src: "https://images.unsplash.com/photo-1593642632559-0c6d3fc62b89?w=600&q=80",
+        alt: "Gaming laptop",
     },
 ];
 
@@ -66,9 +29,9 @@ type Direction = "next" | "prev";
 
 const variants = {
     enter: (dir: Direction) => ({
-        x: dir === "next" ? 120 : -120,
+        x: dir === "next" ? 160 : -160,
         opacity: 0,
-        scale: 0.9,
+        scale: 0.95,
     }),
     center: {
         x: 0,
@@ -76,9 +39,9 @@ const variants = {
         scale: 1,
     },
     exit: (dir: Direction) => ({
-        x: dir === "next" ? -120 : 120,
+        x: dir === "next" ? -160 : 160,
         opacity: 0,
-        scale: 0.9,
+        scale: 0.95,
     }),
 };
 
@@ -90,7 +53,7 @@ function HeroSlideshow() {
         const t = setInterval(() => {
             setDir("next");
             setIdx((i) => (i + 1) % SLIDES.length);
-        }, 3200);
+        }, 3500);
         return () => clearInterval(t);
     }, []);
 
@@ -99,86 +62,42 @@ function HeroSlideshow() {
         setIdx(newIdx);
     };
 
-    const slide = SLIDES[idx];
-
     return (
-        <div className="relative flex flex-col items-center gap-4 select-none">
-            {/* Main animated card */}
-            <div className="relative w-72 h-auto" style={{ minHeight: 260 }}>
+        <div className="flex flex-col items-center gap-4 w-full max-w-md">
+            {/* Image container */}
+            <div className="relative w-full aspect-[4/3] rounded-2xl overflow-hidden shadow-2xl shadow-black/20 dark:shadow-black/50 ring-1 ring-slate-200 dark:ring-white/10">
                 <AnimatePresence mode="wait" custom={dir}>
-                    <motion.div
+                    <motion.img
                         key={idx}
+                        src={SLIDES[idx].src}
+                        alt={SLIDES[idx].alt}
                         custom={dir}
                         variants={variants}
                         initial="enter"
                         animate="center"
                         exit="exit"
-                        transition={{ duration: 0.45, ease: [0.32, 0.72, 0, 1] }}
-                        className={`absolute inset-0 rounded-2xl border border-white/20 dark:border-white/10 bg-gradient-to-br ${slide.color} bg-white dark:bg-white/5 backdrop-blur-sm p-5 shadow-xl`}
-                    >
-                        {/* Label badge */}
-                        <span className="inline-block px-2.5 py-0.5 text-[11px] font-bold rounded-full bg-white/80 dark:bg-white/10 text-slate-700 dark:text-white mb-3">
-                            {slide.label}
-                        </span>
-
-                        {/* Icon */}
-                        <div className={`w-14 h-14 rounded-xl ${slide.iconBg} flex items-center justify-center mb-4 shadow-lg`}>
-                            <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" strokeWidth={1.75} viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" d={slide.icon} />
-                            </svg>
-                        </div>
-
-                        {/* Product info */}
-                        <div className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">{slide.category}</div>
-                        <div className="text-base font-bold text-slate-900 dark:text-white leading-tight mb-3">{slide.name}</div>
-
-                        {/* Pricing */}
-                        <div className="flex items-center gap-2 mb-3">
-                            <span className="text-xl font-extrabold text-slate-900 dark:text-white">{slide.price}</span>
-                            <span className="text-xs text-slate-400 dark:text-slate-500 line-through">{slide.originalPrice}</span>
-                            <span className="px-1.5 py-0.5 text-[10px] font-bold bg-red-500 text-white rounded-md">{slide.discount}</span>
-                        </div>
-
-                        {/* Rating */}
-                        <div className="flex items-center gap-1.5">
-                            <div className="flex gap-0.5">
-                                {Array.from({ length: 5 }).map((_, i) => (
-                                    <svg key={i} className="w-3 h-3 text-amber-400 fill-amber-400" viewBox="0 0 24 24">
-                                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
-                                    </svg>
-                                ))}
-                            </div>
-                            <span className="text-xs text-slate-500 dark:text-slate-400">{slide.rating} ({slide.reviews} reviews)</span>
-                        </div>
-                    </motion.div>
+                        transition={{ duration: 0.5, ease: [0.32, 0.72, 0, 1] }}
+                        className="absolute inset-0 w-full h-full object-cover"
+                        draggable={false}
+                    />
                 </AnimatePresence>
             </div>
 
             {/* Dot indicators */}
-            <div className="flex gap-2 mt-2">
+            <div className="flex gap-2">
                 {SLIDES.map((_, i) => (
                     <button
                         key={i}
                         onClick={() => goTo(i)}
-                        className={`transition-all duration-300 rounded-full ${i === idx ? "w-6 h-2 bg-red-500" : "w-2 h-2 bg-slate-300 dark:bg-white/20 hover:bg-slate-400 dark:hover:bg-white/40"}`}
+                        className={`transition-all duration-300 rounded-full ${
+                            i === idx
+                                ? "w-6 h-2 bg-red-500"
+                                : "w-2 h-2 bg-slate-300 dark:bg-white/20 hover:bg-slate-400 dark:hover:bg-white/40"
+                        }`}
                         aria-label={`Go to slide ${i + 1}`}
                     />
                 ))}
             </div>
-
-            {/* Trust badges floating below */}
-            <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 1.2, duration: 0.6 }}
-                className="flex gap-3 flex-wrap justify-center mt-1"
-            >
-                {[["✓ Free Shipping", ""], ["✓ 30-Day Returns", ""], ["✓ Secure Pay", ""]].map(([t]) => (
-                    <span key={t} className="text-[10px] font-semibold px-2.5 py-1 rounded-full bg-slate-100 dark:bg-white/5 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-white/10">
-                        {t}
-                    </span>
-                ))}
-            </motion.div>
         </div>
     );
 }
