@@ -86,10 +86,14 @@ export const ordersApi = {
 
 // ── Checkout ───────────────────────────────────────────────────────
 export const checkoutApi = {
-    createSession: (items: CartItem[]) =>
-        apiFetch<{ url: string }>('/api/checkout', {
+    createSession: async (items: CartItem[]) => {
+        const res = await fetch('/api/checkout_sessions', {
             method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ items }),
-        }),
+        });
+        if (!res.ok) throw new Error(`API error ${res.status}: ${await res.text()}`);
+        return res.json() as Promise<{ url: string }>;
+    },
 };
 
