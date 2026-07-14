@@ -144,24 +144,38 @@ export default function ProductDetailsPage() {
                                 <div className="text-sm font-medium text-red-500 mb-2">Out of Stock</div>
                             )}
 
-                            <div className="flex gap-4">
+                            <div className="flex gap-3">
                                 <motion.button
                                     whileTap={{ scale: 0.97 }}
                                     onClick={handleAddToCart}
                                     disabled={product.stock === 0}
-                                    className={`flex-1 flex justify-center items-center gap-2 py-4 px-8 rounded-2xl font-bold text-white shadow-xl transition-all ${
+                                    className={`flex-1 flex justify-center items-center gap-2 py-4 px-4 rounded-2xl font-bold transition-all ${
                                         addedToCart
-                                            ? "bg-green-500 shadow-green-500/30"
+                                            ? "bg-green-500 text-white shadow-lg shadow-green-500/30 border-transparent"
                                             : product.stock === 0
-                                                ? "bg-slate-300 dark:bg-slate-800 text-slate-500 shadow-none cursor-not-allowed"
-                                                : "bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 shadow-red-500/30"
+                                                ? "bg-slate-100 dark:bg-white/5 text-slate-400 dark:text-slate-600 border-transparent cursor-not-allowed"
+                                                : "bg-slate-50 dark:bg-white/5 hover:bg-slate-100 dark:hover:bg-white/10 text-slate-700 dark:text-white border border-slate-200 dark:border-white/10"
                                     }`}
                                 >
-                                    {addedToCart ? "Added to Cart" : "Add to Cart"}
+                                    {addedToCart ? "Added" : "Add to Cart"}
                                 </motion.button>
+
+                                <motion.button
+                                    whileTap={{ scale: 0.97 }}
+                                    disabled={product.stock === 0}
+                                    className={`flex-1 flex justify-center items-center gap-2 py-4 px-4 rounded-2xl font-bold text-white shadow-xl transition-all ${
+                                        product.stock === 0
+                                            ? "bg-slate-300 dark:bg-slate-800 text-slate-500 shadow-none cursor-not-allowed"
+                                            : "bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 shadow-red-500/30"
+                                    }`}
+                                >
+                                    Buy Now
+                                </motion.button>
+
                                 <motion.button
                                     whileTap={{ scale: 0.9 }}
-                                    className="p-4 rounded-2xl bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:hover:bg-white/10 text-slate-700 dark:text-white transition-colors"
+                                    className="flex-shrink-0 p-4 rounded-2xl bg-slate-50 dark:bg-white/5 hover:bg-slate-100 dark:hover:bg-white/10 text-slate-700 dark:text-white transition-colors border border-slate-200 dark:border-white/10"
+                                    title="Add to Wishlist"
                                 >
                                     <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
