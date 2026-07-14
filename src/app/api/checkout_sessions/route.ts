@@ -81,6 +81,44 @@ export async function POST(req: Request) {
             cancel_url: `${appUrl}/cart`,
         })
 
+        // 6. Save order to database so it shows up on "My Orders" page
+        try {
+            const total = products.reduce((acc, p) => {
+                const qty = items.find(i => i.productId === String(p._id))?.quantity || 1;
+                return acc + (p.price * qty);
+            }, 0);
+
+            const orderItems = products.map(p => {
+                const qty = items.find(i => i.productId === String(p._id))?.quantity || 1;
+                return {
+                    productId: String(p._id),
+                    name: p.name,
+                    price: p.price,
+                    image: p.image || '',
+                    quantity: qty,
+                };
+            });
+
+            await db.collection('orders').insertOne({
+                userId: session.user.id,
+                items: orderItems,
+                total: total,
+                status: 'processing', // Since we don't have webhooks, set to processing immediately
+                stripeSessionId: checkoutSession.id,
+                createdAt: new Date(),
+                updatedAt: new Date(),
+            });
+
+            // Clear the cart
+            await db.collection('carts').updateOne(
+                { userId: session.user.id },
+                { $set: { items: [], updatedAt: new Date() } }
+            );
+        } catch (dbErr) {
+            console.error('Failed to save order to DB:', dbErr);
+            // We still return the checkout URL even if saving fails
+        }
+
         return NextResponse.json({ url: checkoutSession.url })
     } catch (err) {
         const error = err as { message?: string; statusCode?: number }
