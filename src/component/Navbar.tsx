@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useSession, signOut } from "@/lib/auth-client";
 import { useState, useEffect, useRef } from "react";
 import { useTheme } from "next-themes";
+import { useCart } from "@/components/CartContext";
 
 const NAV_LOGGED_OUT = [
     { label: "Home", href: "/" },
@@ -21,10 +22,11 @@ const NAV_LOGGED_IN = [
 
 export default function Navbar() {
     const { data: session, isPending } = useSession();
+    const { items } = useCart();
     const [mobileOpen, setMobileOpen] = useState(false);
     const [scrolled, setScrolled] = useState(false);
     const [userMenuOpen, setUserMenuOpen] = useState(false);
-    const [cartCount] = useState(3);
+    const cartCount = items.reduce((sum, item) => sum + item.quantity, 0);
     const userMenuRef = useRef<HTMLDivElement>(null);
     const { theme, setTheme } = useTheme();
     const [mounted, setMounted] = useState(false);
@@ -115,8 +117,7 @@ export default function Navbar() {
                             </button>
 
                             {/* Cart */}
-                            {session && (
-                                <Link href="/cart" className="relative p-2 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-900 dark:text-white hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors duration-300">
+                            <Link href="/cart" className="relative p-2 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-900 dark:text-white hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors duration-300">
                                     <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
                                         <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" />
                                         <line x1="3" y1="6" x2="21" y2="6" />
@@ -128,7 +129,6 @@ export default function Navbar() {
                                         </span>
                                     )}
                                 </Link>
-                            )}
 
                             {/* Divider */}
                             <div className="h-6 w-px bg-slate-200 dark:bg-slate-800 hidden sm:block mx-1 transition-colors duration-300" />

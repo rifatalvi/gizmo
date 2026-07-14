@@ -3,13 +3,14 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useSession } from "@/lib/auth-client";
-import { cartApi, type Cart, type CartItem } from "@/lib/api";
+import { cartApi, checkoutApi, type Cart, type CartItem } from "@/lib/api";
 import Footer from "@/component/Footer";
 
 export default function CartPage() {
     const { data: session } = useSession();
     const [cart, setCart] = useState<Cart | null>(null);
     const [loading, setLoading] = useState(true);
+    const [checkingOut, setCheckingOut] = useState(false);
 
     useEffect(() => {
         if (!session?.user.id) { setLoading(false); return; }
@@ -32,6 +33,22 @@ export default function CartPage() {
     const subtotal = cart?.items.reduce((s, i) => s + i.price * i.quantity, 0) ?? 0;
     const shipping = subtotal > 99 ? 0 : 9.99;
     const total = subtotal + shipping;
+
+    const handleCheckout = async () => {
+        if (!cart?.items.length) return;
+        setCheckingOut(true);
+        try {
+            const session = await checkoutApi.createSession(cart.items);
+            if (session.url) {
+                window.location.href = session.url;
+            }
+        } catch (err) {
+            console.error('Checkout failed:', err);
+            alert('Failed to start checkout. Please try again.');
+        } finally {
+            setCheckingOut(false);
+        }
+    };
 
     if (!session) return (
         <div className="min-h-screen bg-slate-50 dark:bg-[#0a0a0f] flex flex-col items-center justify-center gap-4">
@@ -103,9 +120,25 @@ export default function CartPage() {
                                     <span className="text-slate-900 dark:text-white">Total</span><span className="text-slate-900 dark:text-white">${total.toFixed(2)}</span>
                                 </div>
                             </div>
-                            <Link href="/checkout" className="mt-6 block w-full py-3 text-center font-semibold text-white bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 rounded-xl shadow-lg shadow-red-500/20 transition-all active:scale-95">
-                                Proceed to Checkout
-                            </Link>
+                            <button
+                                onClick={handleCheckout}
+                                disabled={checkingOut || !cart?.items.length}
+                                className={`mt-6 w-full py-3 text-center font-semibold text-white rounded-xl shadow-lg transition-all active:scale-95 flex items-center justify-center gap-2 ${
+                                    checkingOut
+                                        ? "bg-gradient-to-r from-red-700 to-rose-700 opacity-80 cursor-wait shadow-red-500/20"
+                                        : "bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 shadow-red-500/20"
+                                }`}
+                            >
+                                {checkingOut ? (
+                                    <>
+                                        <svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+                                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                                        </svg>
+                                        Redirecting to Stripe...
+                                    </>
+                                ) : "Proceed to Checkout"}
+                            </button>
                             <Link href="/shop" className="mt-3 block text-center text-sm text-slate-500 dark:text-gray-500 hover:text-red-400 transition-colors">
                                 Continue Shopping
                             </Link>

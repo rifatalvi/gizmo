@@ -2,7 +2,7 @@
 
 import { useEffect, useState, use } from "react";
 import Link from "next/link";
-import { productsApi, type Product } from "@/lib/api";
+import { productsApi, checkoutApi, type Product } from "@/lib/api";
 import ProductCard from "@/component/ProductCard";
 import Footer from "@/component/Footer";
 import { motion, AnimatePresence } from "motion/react";
@@ -19,7 +19,10 @@ export default function ProductDetailsPage() {
     const [activeTab, setActiveTab] = useState<"description" | "specs" | "reviews">("description");
     const [activeImage, setActiveImage] = useState(0);
     const [addedToCart, setAddedToCart] = useState(false);
-    const { addToCart } = useCart();
+    const [buyingNow, setBuyingNow] = useState(false);
+    const { items, addToCart } = useCart();
+
+    const isAlreadyAdded = product ? items.some(item => item.productId === product._id) : false;
 
     useEffect(() => {
         const fetchProduct = async () => {
@@ -69,6 +72,28 @@ export default function ProductDetailsPage() {
         }
         setAddedToCart(true);
         setTimeout(() => setAddedToCart(false), 2000);
+    };
+
+    const handleBuyNow = async () => {
+        if (!product) return;
+        setBuyingNow(true);
+        try {
+            const session = await checkoutApi.createSession([{
+                productId: product._id,
+                name: product.name,
+                price: product.price,
+                image: product.image,
+                quantity: 1,
+            }]);
+            if (session.url) {
+                window.location.href = session.url;
+            }
+        } catch (err) {
+            console.error('Checkout failed:', err);
+            alert('Failed to start checkout. Please try again.');
+        } finally {
+            setBuyingNow(false);
+        }
     };
 
     return (
@@ -151,30 +176,41 @@ export default function ProductDetailsPage() {
 
                             <div className="flex gap-3">
                                 <motion.button
-                                    whileTap={{ scale: 0.97 }}
+                                    whileTap={!isAlreadyAdded && product.stock > 0 ? { scale: 0.97 } : {}}
                                     onClick={handleAddToCart}
-                                    disabled={product.stock === 0}
+                                    disabled={product.stock === 0 || isAlreadyAdded}
                                     className={`flex-1 flex justify-center items-center gap-2 py-4 px-4 rounded-2xl font-bold transition-all ${
-                                        addedToCart
-                                            ? "bg-green-500 text-white shadow-lg shadow-green-500/30 border-transparent"
+                                        isAlreadyAdded || addedToCart
+                                            ? "bg-green-500 text-white shadow-lg shadow-green-500/30 border-transparent cursor-not-allowed"
                                             : product.stock === 0
                                                 ? "bg-slate-100 dark:bg-white/5 text-slate-400 dark:text-slate-600 border-transparent cursor-not-allowed"
                                                 : "bg-slate-50 dark:bg-white/5 hover:bg-slate-100 dark:hover:bg-white/10 text-slate-700 dark:text-white border border-slate-200 dark:border-white/10"
                                     }`}
                                 >
-                                    {addedToCart ? "Added" : "Add to Cart"}
+                                    {isAlreadyAdded || addedToCart ? "Already Added" : "Add to Cart"}
                                 </motion.button>
 
                                 <motion.button
-                                    whileTap={{ scale: 0.97 }}
-                                    disabled={product.stock === 0}
+                                    whileTap={product.stock > 0 && !buyingNow ? { scale: 0.97 } : {}}
+                                    onClick={handleBuyNow}
+                                    disabled={product.stock === 0 || buyingNow}
                                     className={`flex-1 flex justify-center items-center gap-2 py-4 px-4 rounded-2xl font-bold text-white shadow-xl transition-all ${
                                         product.stock === 0
                                             ? "bg-slate-300 dark:bg-slate-800 text-slate-500 shadow-none cursor-not-allowed"
-                                            : "bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 shadow-red-500/30"
+                                            : buyingNow
+                                                ? "bg-gradient-to-r from-red-700 to-rose-700 opacity-80 cursor-wait shadow-red-500/30"
+                                                : "bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 shadow-red-500/30"
                                     }`}
                                 >
-                                    Buy Now
+                                    {buyingNow ? (
+                                        <>
+                                            <svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+                                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                                            </svg>
+                                            Redirecting...
+                                        </>
+                                    ) : "Buy Now"}
                                 </motion.button>
 
                                 <motion.button

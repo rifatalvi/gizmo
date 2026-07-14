@@ -83,3 +83,13 @@ export const ordersApi = {
     place: (order: Omit<Order, '_id' | 'createdAt' | 'status'>) =>
         apiFetch<Order>('/api/orders', { method: 'POST', body: JSON.stringify(order) }),
 };
+
+// ── Checkout ───────────────────────────────────────────────────────
+export const checkoutApi = {
+    createSession: (items: CartItem[]) =>
+        apiFetch<{ url: string }>('/api/checkout', {
+            method: 'POST',
+            body: JSON.stringify({ items }),
+        }),
+};
+

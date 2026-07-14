@@ -39,7 +39,9 @@ const CATEGORY_COLORS: Record<string, string> = {
 export default function ProductCard({ product, onAddToCart, onWishlist }: ProductCardProps) {
     const [wishlisted, setWishlisted] = useState(false);
     const [addedToCart, setAddedToCart] = useState(false);
-    const { addToCart } = useCart();
+    const { items, addToCart } = useCart();
+
+    const isAlreadyAdded = items.some(item => item.productId === product._id);
 
     const handleAddToCart = async (e: React.MouseEvent) => {
         e.preventDefault();
@@ -137,18 +139,18 @@ export default function ProductCard({ product, onAddToCart, onWishlist }: Produc
                         </Link>
                         <button
                             onClick={handleAddToCart}
-                            disabled={product.stock === 0}
+                            disabled={product.stock === 0 || isAlreadyAdded}
                             className={`flex justify-center items-center p-2.5 rounded-xl transition-all duration-200 active:scale-95 ${
-                                addedToCart
-                                    ? "bg-green-500 text-white shadow-lg shadow-green-500/20"
+                                isAlreadyAdded || addedToCart
+                                    ? "bg-green-500 text-white shadow-lg shadow-green-500/20 cursor-not-allowed"
                                     : product.stock === 0
                                         ? "bg-slate-200 dark:bg-gray-800 text-slate-400 dark:text-gray-600 cursor-not-allowed"
                                         : "bg-red-600 hover:bg-red-500 text-white shadow-lg shadow-red-500/20"
                             }`}
                             aria-label="Add to cart"
-                            title={product.stock === 0 ? "Out of Stock" : "Add to cart"}
+                            title={isAlreadyAdded ? "Already added" : product.stock === 0 ? "Out of Stock" : "Add to cart"}
                         >
-                            {addedToCart ? (
+                            {isAlreadyAdded || addedToCart ? (
                                 <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                                 </svg>
