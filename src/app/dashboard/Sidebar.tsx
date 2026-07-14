@@ -9,6 +9,8 @@ import {
   MdCreditCard,
   MdLogout,
   MdMoreVert,
+  MdAddBox,
+  MdList,
 } from "react-icons/md";
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
 import { PanelLeftClose, PanelLeft } from "lucide-react";
@@ -31,6 +33,8 @@ export default function Sidebar() {
     { icon: MdShoppingCart, href: "/dashboard/admin/orders", label: "Completed Orders" },
     { icon: MdCreditCard, href: "/dashboard/admin/transactions", label: "All Transactions" },
     { icon: MdShoppingCart, href: "/dashboard/admin/carts", label: "Active Carts" },
+    { icon: MdAddBox, href: "/dashboard/admin/items/add", label: "Add Item" },
+    { icon: MdList, href: "/dashboard/admin/items/manage", label: "Manage Items" },
   ];
 
   const sidebarItems: Record<string, any[]> = {

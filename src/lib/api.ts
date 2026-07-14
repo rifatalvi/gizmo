@@ -63,6 +63,8 @@ export const productsApi = {
     get: (id: string) => apiFetch<Product>(`/api/products/${id}`),
     featured: () => apiFetch<{ products: Product[] }>('/api/products?featured=true&limit=8'),
     deals: () => apiFetch<{ products: Product[] }>('/api/products?deal=true&limit=12'),
+    create: (product: Partial<Product>) => apiFetch<Product>('/api/products', { method: 'POST', body: JSON.stringify(product) }),
+    delete: (id: string) => apiFetch<{ success: boolean }>(`/api/products/${id}`, { method: 'DELETE' }),
 };
 
 // ── Cart ──────────────────────────────────────────────────────────
