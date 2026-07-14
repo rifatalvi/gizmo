@@ -3,75 +3,107 @@
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { addItem } from "../actions"
-import { useSession } from "@/lib/auth-client"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
 export default function AddItemPage() {
-    const { data: session, isPending } = useSession()
     const router = useRouter()
     const [loading, setLoading] = useState(false)
+    const [error, setError] = useState("")
 
-    if (isPending) {
-        return <div className="p-8 text-center text-slate-500">Loading...</div>
-    }
-
-    if (!session) {
-        router.push("/login")
-        return null
-    }
-
-    async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
+    async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault()
         setLoading(true)
+        setError("")
+
         try {
             const formData = new FormData(e.currentTarget)
             await addItem(formData)
             router.push("/items/manage")
-        } catch (error) {
-            console.error("Failed to add item:", error)
-            alert("Failed to add item")
+        } catch (err: any) {
+            setError(err.message || "Failed to add item")
         } finally {
             setLoading(false)
         }
     }
 
     return (
-        <div className="max-w-2xl mx-auto py-8">
+        <div className="max-w-2xl mx-auto p-4 sm:p-6 lg:p-8">
             <Card>
                 <CardHeader>
-                    <CardTitle>Add New Item</CardTitle>
-                    <CardDescription>Fill out the form below to add a new product to the catalog.</CardDescription>
+                    <CardTitle className="text-2xl font-bold">Add New Product</CardTitle>
                 </CardHeader>
-                <CardContent>
-                    <form onSubmit={onSubmit} className="space-y-4">
+                <form onSubmit={handleSubmit}>
+                    <CardContent className="space-y-4">
+                        {error && (
+                            <div className="p-3 bg-red-100 text-red-600 rounded-md text-sm">
+                                {error}
+                            </div>
+                        )}
+                        
                         <div className="space-y-2">
-                            <Label htmlFor="title">Title</Label>
-                            <Input id="title" name="title" required placeholder="Product Name" />
+                            <Label htmlFor="name">Product Name *</Label>
+                            <Input id="name" name="name" required placeholder="e.g. MacBook Pro 16" />
                         </div>
+                        
+                        <div className="grid grid-cols-2 gap-4">
+                            <div className="space-y-2">
+                                <Label htmlFor="category">Category *</Label>
+                                <Select name="category" required defaultValue="laptops">
+                                    <SelectTrigger>
+                                        <SelectValue placeholder="Select category" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="laptops">Laptops</SelectItem>
+                                        <SelectItem value="phones">Phones</SelectItem>
+                                        <SelectItem value="audio">Audio</SelectItem>
+                                        <SelectItem value="gaming">Gaming</SelectItem>
+                                        <SelectItem value="monitors">Monitors</SelectItem>
+                                        <SelectItem value="accessories">Accessories</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                            
+                            <div className="space-y-2">
+                                <Label htmlFor="brand">Brand</Label>
+                                <Input id="brand" name="brand" placeholder="e.g. Apple" />
+                            </div>
+                        </div>
+
                         <div className="space-y-2">
-                            <Label htmlFor="shortDesc">Short Description</Label>
-                            <Input id="shortDesc" name="shortDesc" required placeholder="Brief description" />
+                            <Label htmlFor="description">Full Description</Label>
+                            <Textarea id="description" name="description" rows={5} placeholder="Detailed product description..." />
                         </div>
+
+                        <div className="grid grid-cols-2 gap-4">
+                            <div className="space-y-2">
+                                <Label htmlFor="price">Price ($) *</Label>
+                                <Input id="price" name="price" type="number" step="0.01" min="0" required placeholder="999.99" />
+                            </div>
+                            <div className="space-y-2">
+                                <Label htmlFor="stock">Stock Quantity</Label>
+                                <Input id="stock" name="stock" type="number" min="0" defaultValue="10" />
+                            </div>
+                        </div>
+
                         <div className="space-y-2">
-                            <Label htmlFor="fullDesc">Full Description</Label>
-                            <Input id="fullDesc" name="fullDesc" placeholder="Detailed product description" />
+                            <Label htmlFor="image">Image URL</Label>
+                            <Input id="image" name="image" type="url" placeholder="https://example.com/image.jpg" />
+                            <p className="text-xs text-slate-500">Leave blank to use a default placeholder image.</p>
                         </div>
-                        <div className="space-y-2">
-                            <Label htmlFor="price">Price</Label>
-                            <Input id="price" name="price" type="number" step="0.01" required placeholder="0.00" />
-                        </div>
-                        <div className="space-y-2">
-                            <Label htmlFor="imageUrl">Image URL (Optional)</Label>
-                            <Input id="imageUrl" name="imageUrl" placeholder="https://..." />
-                        </div>
-                        <Button type="submit" disabled={loading} className="w-full">
-                            {loading ? "Submitting..." : "Submit"}
+                    </CardContent>
+                    
+                    <CardFooter className="flex justify-between border-t p-6">
+                        <Button variant="ghost" type="button" onClick={() => router.back()}>Cancel</Button>
+                        <Button type="submit" disabled={loading}>
+                            {loading ? "Saving..." : "Add Product"}
                         </Button>
-                    </form>
-                </CardContent>
+                    </CardFooter>
+                </form>
             </Card>
         </div>
     )

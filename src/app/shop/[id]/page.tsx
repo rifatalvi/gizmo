@@ -6,6 +6,7 @@ import { productsApi, type Product } from "@/lib/api";
 import ProductCard from "@/component/ProductCard";
 import Footer from "@/component/Footer";
 import { motion, AnimatePresence } from "motion/react";
+import { useCart } from "@/components/CartContext";
 
 import { useParams } from "next/navigation";
 
@@ -18,6 +19,7 @@ export default function ProductDetailsPage() {
     const [activeTab, setActiveTab] = useState<"description" | "specs" | "reviews">("description");
     const [activeImage, setActiveImage] = useState(0);
     const [addedToCart, setAddedToCart] = useState(false);
+    const { addToCart } = useCart();
 
     useEffect(() => {
         const fetchProduct = async () => {
@@ -61,7 +63,10 @@ export default function ProductDetailsPage() {
         "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=800&q=80",
     ];
 
-    const handleAddToCart = () => {
+    const handleAddToCart = async () => {
+        if (product) {
+            await addToCart(product);
+        }
         setAddedToCart(true);
         setTimeout(() => setAddedToCart(false), 2000);
     };

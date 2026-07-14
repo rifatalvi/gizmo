@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import type { Product } from "@/lib/api";
+import { useCart } from "@/components/CartContext";
 
 interface ProductCardProps {
     product: Product;
@@ -38,11 +39,15 @@ const CATEGORY_COLORS: Record<string, string> = {
 export default function ProductCard({ product, onAddToCart, onWishlist }: ProductCardProps) {
     const [wishlisted, setWishlisted] = useState(false);
     const [addedToCart, setAddedToCart] = useState(false);
+    const { addToCart } = useCart();
 
-    const handleAddToCart = (e: React.MouseEvent) => {
+    const handleAddToCart = async (e: React.MouseEvent) => {
         e.preventDefault();
         e.stopPropagation();
         onAddToCart?.(product);
+        
+        await addToCart(product);
+        
         setAddedToCart(true);
         setTimeout(() => setAddedToCart(false), 1500);
     };

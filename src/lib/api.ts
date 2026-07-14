@@ -1,3 +1,5 @@
+// Points to the Express backend server (gizmo-server) running on port 5000.
+// Set NEXT_PUBLIC_API_URL in .env to override (e.g. in production).
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:5000';
 
 export interface Product {
@@ -46,6 +48,7 @@ async function apiFetch<T>(path: string, options?: RequestInit): Promise<T> {
     const res = await fetch(`${BASE_URL}${path}`, {
         ...options,
         headers: { 'Content-Type': 'application/json', ...options?.headers },
+        cache: 'no-store',
     });
     if (!res.ok) throw new Error(`API error ${res.status}: ${await res.text()}`);
     return res.json() as Promise<T>;

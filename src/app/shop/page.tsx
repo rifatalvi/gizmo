@@ -141,8 +141,11 @@ function PaginationBar({
 }
 
 export default function ShopPage() {
-    const [allProducts, setAllProducts] = useState<Product[]>([]);
+    const [products, setProducts] = useState<Product[]>([]);
+    const [total, setTotal] = useState(0);
+    const [totalPages, setTotalPages] = useState(1);
     const [loading, setLoading] = useState(true);
+
     const [search, setSearch] = useState("");
     const [debouncedSearch, setDebouncedSearch] = useState("");
     const [category, setCategory] = useState("all");
@@ -154,54 +157,46 @@ export default function ShopPage() {
 
     // Debounce search
     useEffect(() => {
-        const t = setTimeout(() => setDebouncedSearch(search), 300);
+        const t = setTimeout(() => setDebouncedSearch(search), 400);
         return () => clearTimeout(t);
     }, [search]);
 
-    // Fetch all products once
+    // Reset page on any filter change
     useEffect(() => {
-        const fetch = async () => {
-            setLoading(true);
-            try {
-                const data = await productsApi.list({ limit: "200" });
-                setAllProducts(data.products);
-            } catch {
-                setAllProducts([]);
-            } finally {
-                setLoading(false);
-            }
-        };
-        fetch();
-    }, []);
+        setPage(1);
+    }, [debouncedSearch, category, priceRange, minRating, sortBy]);
 
-    // Reset page on filter change
-    useEffect(() => { setPage(1); }, [debouncedSearch, category, priceRange, minRating, sortBy]);
+    // Fetch from MongoDB API — all filtering/sorting/pagination done server-side
+    const fetchProducts = useCallback(async () => {
+        setLoading(true);
+        try {
+            const params: Record<string, string> = {
+                page: String(page),
+                limit: String(ITEMS_PER_PAGE),
+                sort: sortBy,
+                priceMin: String(priceRange.min),
+                priceMax: String(priceRange.max),
+            };
+            if (debouncedSearch) params.search = debouncedSearch;
+            if (category !== "all") params.category = category;
+            if (minRating > 0) params.minRating = String(minRating);
 
-    // Client-side filtering + sorting
-    const filtered = allProducts
-        .filter(p => {
-            if (category !== "all" && p.category !== category) return false;
-            if (p.price < priceRange.min || p.price > priceRange.max) return false;
-            if (p.rating < minRating) return false;
-            if (debouncedSearch) {
-                const q = debouncedSearch.toLowerCase();
-                return (
-                    p.name.toLowerCase().includes(q) ||
-                    p.brand.toLowerCase().includes(q) ||
-                    p.category.toLowerCase().includes(q)
-                );
-            }
-            return true;
-        })
-        .sort((a, b) => {
-            if (sortBy === "price_asc") return a.price - b.price;
-            if (sortBy === "price_desc") return b.price - a.price;
-            if (sortBy === "rating") return b.rating - a.rating;
-            return 0; // newest = server order
-        });
+            const data = await productsApi.list(params);
+            setProducts(data.products);
+            setTotal(data.total);
+            setTotalPages(data.pages);
+        } catch {
+            setProducts([]);
+            setTotal(0);
+            setTotalPages(1);
+        } finally {
+            setLoading(false);
+        }
+    }, [page, debouncedSearch, category, priceRange, minRating, sortBy]);
 
-    const totalPages = Math.ceil(filtered.length / ITEMS_PER_PAGE);
-    const paginated = filtered.slice((page - 1) * ITEMS_PER_PAGE, page * ITEMS_PER_PAGE);
+    useEffect(() => {
+        fetchProducts();
+    }, [fetchProducts]);
 
     const activeFilterCount = [
         category !== "all",
@@ -216,7 +211,7 @@ export default function ShopPage() {
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <h1 className="text-3xl font-extrabold text-slate-900 dark:text-white mb-1">Shop</h1>
                     <p className="text-slate-500 dark:text-slate-400 text-sm">
-                        {loading ? "Loading…" : `${filtered.length.toLocaleString()} product${filtered.length !== 1 ? "s" : ""} found`}
+                        {loading ? "Loading…" : `${total.toLocaleString()} product${total !== 1 ? "s" : ""} found`}
                     </p>
                 </div>
             </div>
@@ -384,7 +379,7 @@ export default function ShopPage() {
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                         {Array.from({ length: 8 }).map((_, i) => <SkeletonCard key={i} />)}
                     </div>
-                ) : paginated.length === 0 ? (
+                ) : products.length === 0 ? (
                     <div className="text-center py-24 bg-white dark:bg-white/5 rounded-2xl border border-slate-200 dark:border-white/5">
                         <p className="text-4xl mb-4">🔍</p>
                         <p className="text-slate-900 dark:text-white font-semibold text-lg mb-1">No products found</p>
@@ -398,13 +393,13 @@ export default function ShopPage() {
                     </div>
                 ) : (
                     <motion.div
-                        key={`${page}-${category}-${sortBy}`}
+                        key={`${page}-${category}-${sortBy}-${debouncedSearch}`}
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         transition={{ duration: 0.3 }}
                         className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6"
                     >
-                        {paginated.map(product => (
+                        {products.map(product => (
                             <ProductCard key={product._id} product={product} />
                         ))}
                     </motion.div>
@@ -415,7 +410,7 @@ export default function ShopPage() {
                     <PaginationBar
                         page={page}
                         totalPages={totalPages}
-                        total={filtered.length}
+                        total={total}
                         onPage={p => { setPage(p); window.scrollTo({ top: 0, behavior: "smooth" }); }}
                     />
                 )}
