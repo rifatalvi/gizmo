@@ -75,31 +75,31 @@ export function OrderStatusSelect({ orderId, initialStatus }: Props) {
                 >
                     <Dropdown.Section>
                         <Header>Update Status</Header>
-                        <Dropdown.Item id="pending" textValue="Pending">
+                        <Dropdown.Item key="pending" textValue="Pending">
                             <Dropdown.ItemIndicator>
                                 {({ isSelected }) => (isSelected ? CustomCheckmarkIcon : null)}
                             </Dropdown.ItemIndicator>
                             <Label>Pending</Label>
                         </Dropdown.Item>
-                        <Dropdown.Item id="processing" textValue="Processing">
+                        <Dropdown.Item key="processing" textValue="Processing">
                             <Dropdown.ItemIndicator>
                                 {({ isSelected }) => (isSelected ? CustomCheckmarkIcon : null)}
                             </Dropdown.ItemIndicator>
                             <Label>Processing</Label>
                         </Dropdown.Item>
-                        <Dropdown.Item id="shipped" textValue="Shipped">
+                        <Dropdown.Item key="shipped" textValue="Shipped">
                             <Dropdown.ItemIndicator>
                                 {({ isSelected }) => (isSelected ? CustomCheckmarkIcon : null)}
                             </Dropdown.ItemIndicator>
                             <Label>Shipped</Label>
                         </Dropdown.Item>
-                        <Dropdown.Item id="delivered" textValue="Delivered">
+                        <Dropdown.Item key="delivered" textValue="Delivered">
                             <Dropdown.ItemIndicator>
                                 {({ isSelected }) => (isSelected ? CustomCheckmarkIcon : null)}
                             </Dropdown.ItemIndicator>
                             <Label>Delivered</Label>
                         </Dropdown.Item>
-                        <Dropdown.Item id="cancelled" textValue="Cancelled">
+                        <Dropdown.Item key="cancelled" textValue="Cancelled">
                             <Dropdown.ItemIndicator>
                                 {({ isSelected }) => (isSelected ? CustomCheckmarkIcon : null)}
                             </Dropdown.ItemIndicator>
