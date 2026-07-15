@@ -4,14 +4,30 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { ordersApi } from "@/lib/api";
 import type { Selection } from "@heroui/react";
-import { Button, Dropdown, Header, Label } from "@heroui/react";
+import { Button, Dropdown, Header, Label, Spinner } from "@heroui/react";
 
+// Light mode: black text + coloured background
+// Dark mode: coloured text + dimmed background
 const STATUS_STYLES: Record<string, string> = {
-    pending: "text-yellow-600 bg-yellow-100 dark:bg-yellow-900/30 dark:text-yellow-400",
-    processing: "text-blue-600 bg-blue-100 dark:bg-blue-900/30 dark:text-blue-400",
-    shipped: "text-purple-600 bg-purple-100 dark:bg-purple-900/30 dark:text-purple-400",
-    delivered: "text-green-600 bg-green-100 dark:bg-green-900/30 dark:text-green-400",
-    cancelled: "text-rose-600 bg-rose-100 dark:bg-rose-900/30 dark:text-rose-400",
+    pending:
+        "text-gray-900 bg-yellow-100 dark:bg-yellow-900/30 dark:text-yellow-400 border border-yellow-200 dark:border-yellow-800/50",
+    processing:
+        "text-gray-900 bg-blue-100 dark:bg-blue-900/30 dark:text-blue-400 border border-blue-200 dark:border-blue-800/50",
+    shipped:
+        "text-gray-900 bg-purple-100 dark:bg-purple-900/30 dark:text-purple-400 border border-purple-200 dark:border-purple-800/50",
+    delivered:
+        "text-gray-900 bg-green-100 dark:bg-green-900/30 dark:text-green-400 border border-green-200 dark:border-green-800/50",
+    cancelled:
+        "text-gray-900 bg-rose-100 dark:bg-rose-900/30 dark:text-rose-400 border border-rose-200 dark:border-rose-800/50",
+};
+
+// Capitalised labels for display
+const STATUS_LABELS: Record<string, string> = {
+    pending: "Pending",
+    processing: "Processing",
+    shipped: "Shipped",
+    delivered: "Delivered",
+    cancelled: "Cancelled",
 };
 
 interface Props {
@@ -38,7 +54,6 @@ export function OrderStatusSelect({ orderId, initialStatus }: Props) {
 
     const handleSelectionChange = async (keys: Selection) => {
         setSelected(keys);
-
         const selectedValue = Array.from(keys).join("") as string;
         if (!selectedValue) return;
 
@@ -62,11 +77,25 @@ export function OrderStatusSelect({ orderId, initialStatus }: Props) {
             <Button
                 aria-label="Order Status"
                 variant="ghost"
-                className={`px-3 py-1.5 text-xs font-semibold rounded-full capitalize w-[110px] justify-between ${STATUS_STYLES[currentStatus] || ""}`}
+                className={`
+          px-3 py-1.5 text-xs font-semibold rounded-full capitalize 
+          w-[110px] justify-between transition-all duration-200
+          hover:scale-105 active:scale-95
+          ${STATUS_STYLES[currentStatus] || ""}
+          ${isLoading ? "opacity-60 pointer-events-none" : ""}
+        `}
                 isDisabled={isLoading}
             >
-                {isLoading ? "..." : currentStatus}
+                {isLoading ? (
+                    <span className="flex items-center gap-1">
+                        <Spinner size="sm" color="current" />
+                        <span>Updating…</span>
+                    </span>
+                ) : (
+                    STATUS_LABELS[currentStatus] || currentStatus
+                )}
             </Button>
+
             <Dropdown.Popover className="min-w-[200px]">
                 <Dropdown.Menu
                     selectedKeys={selected}
@@ -74,37 +103,50 @@ export function OrderStatusSelect({ orderId, initialStatus }: Props) {
                     onSelectionChange={handleSelectionChange}
                 >
                     <Dropdown.Section>
-                        <Header>Update Status</Header>
-                        <Dropdown.Item key="pending" textValue="Pending">
-                            <Dropdown.ItemIndicator>
-                                {({ isSelected }) => (isSelected ? CustomCheckmarkIcon : null)}
-                            </Dropdown.ItemIndicator>
-                            <Label>Pending</Label>
-                        </Dropdown.Item>
-                        <Dropdown.Item key="processing" textValue="Processing">
-                            <Dropdown.ItemIndicator>
-                                {({ isSelected }) => (isSelected ? CustomCheckmarkIcon : null)}
-                            </Dropdown.ItemIndicator>
-                            <Label>Processing</Label>
-                        </Dropdown.Item>
-                        <Dropdown.Item key="shipped" textValue="Shipped">
-                            <Dropdown.ItemIndicator>
-                                {({ isSelected }) => (isSelected ? CustomCheckmarkIcon : null)}
-                            </Dropdown.ItemIndicator>
-                            <Label>Shipped</Label>
-                        </Dropdown.Item>
-                        <Dropdown.Item key="delivered" textValue="Delivered">
-                            <Dropdown.ItemIndicator>
-                                {({ isSelected }) => (isSelected ? CustomCheckmarkIcon : null)}
-                            </Dropdown.ItemIndicator>
-                            <Label>Delivered</Label>
-                        </Dropdown.Item>
-                        <Dropdown.Item key="cancelled" textValue="Cancelled">
-                            <Dropdown.ItemIndicator>
-                                {({ isSelected }) => (isSelected ? CustomCheckmarkIcon : null)}
-                            </Dropdown.ItemIndicator>
-                            <Label>Cancelled</Label>
-                        </Dropdown.Item>
+                        <Header className="px-3 py-2 text-xs font-medium text-muted-foreground border-b border-divider">
+                            Update Status
+                        </Header>
+
+                        {Object.entries(STATUS_LABELS).map(([id, label]) => {
+                            const isSelected = selected.has(id);
+                            const colorClasses = STATUS_STYLES[id] || "";
+                            // Extract background and text classes for the dot
+                            const bgClass = colorClasses
+                                .split(" ")
+                                .find((c) => c.startsWith("bg-") || c.startsWith("dark:bg-"));
+                            const textClass = colorClasses
+                                .split(" ")
+                                .find((c) => c.startsWith("text-") || c.startsWith("dark:text-"));
+
+                            return (
+                                <Dropdown.Item
+                                    key={id}
+                                    id={id}
+                                    textValue={label}
+                                    className={`
+                    flex items-center gap-2 px-3 py-2 text-sm
+                    hover:bg-default-100 dark:hover:bg-default-50
+                    data-[highlighted]:bg-default-100 dark:data-[highlighted]:bg-default-50
+                    transition-colors duration-150
+                    ${isSelected ? "bg-default-200/50 dark:bg-default-100/30" : ""}
+                  `}
+                                >
+                                    <Dropdown.ItemIndicator className="w-5 h-5 flex items-center justify-center">
+                                        {isSelected ? CustomCheckmarkIcon : null}
+                                    </Dropdown.ItemIndicator>
+
+                                    <span className="flex-1">{label}</span>
+
+                                    {/* Status colour indicator dot */}
+                                    <span
+                                        className={`
+                      w-2.5 h-2.5 rounded-full flex-shrink-0
+                      ${bgClass || "bg-gray-300 dark:bg-gray-600"}
+                    `}
+                                    />
+                                </Dropdown.Item>
+                            );
+                        })}
                     </Dropdown.Section>
                 </Dropdown.Menu>
             </Dropdown.Popover>

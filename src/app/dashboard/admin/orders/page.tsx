@@ -5,6 +5,8 @@ import { redirect } from "next/navigation";
 import type { Order } from "@/lib/api";
 import { OrderStatusSelect } from "./OrderStatusSelect";
 
+export const dynamic = "force-dynamic";
+
 export default async function AdminOrdersPage() {
 
 
