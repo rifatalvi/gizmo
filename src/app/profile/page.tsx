@@ -1,14 +1,19 @@
 "use client";
 
-import { useSession, signOut } from "@/lib/auth-client";
+import { useSession, signOut, authClient } from "@/lib/auth-client";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Footer from "@/component/Footer";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import Image from "next/image";
 
 export default function ProfilePage() {
     const { data: session, isPending } = useSession();
     const router = useRouter();
+    
+    const [isEditingImage, setIsEditingImage] = useState(false);
+    const [imageUrl, setImageUrl] = useState("");
+    const [isUpdating, setIsUpdating] = useState(false);
 
     useEffect(() => {
         if (!isPending && !session) {
@@ -38,6 +43,22 @@ export default function ProfilePage() {
         router.push("/");
     };
 
+    const handleUpdateImage = async () => {
+        if (!imageUrl) return;
+        setIsUpdating(true);
+        try {
+            await authClient.updateUser({
+                image: imageUrl
+            });
+            setIsEditingImage(false);
+            window.location.reload(); // Quick refresh to reflect the new image
+        } catch (e) {
+            console.error("Failed to update image", e);
+        } finally {
+            setIsUpdating(false);
+        }
+    };
+
     return (
         <div className="min-h-screen bg-slate-50 dark:bg-[#0a0a0f] flex flex-col">
             <div className="flex-1 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 w-full">
@@ -45,20 +66,59 @@ export default function ProfilePage() {
 
                 <div className="bg-white dark:bg-[#111118] border border-slate-200 dark:border-white/5 rounded-2xl p-6 md:p-8 flex flex-col md:flex-row items-start md:items-center gap-8 shadow-xl">
                     {/* Avatar */}
-                    <div className="w-24 h-24 rounded-full bg-gradient-to-br from-red-500 to-rose-600 flex flex-shrink-0 items-center justify-center text-4xl font-bold text-slate-900 dark:text-white shadow-lg shadow-red-500/30">
-                        {session.user.name?.charAt(0).toUpperCase() ?? "U"}
+                    <div className="flex flex-col items-center gap-3">
+                        <div 
+                            className="relative w-24 h-24 rounded-full bg-gradient-to-br from-red-500 to-rose-600 flex flex-shrink-0 items-center justify-center text-4xl font-bold text-slate-900 dark:text-white shadow-lg shadow-red-500/30 overflow-hidden group cursor-pointer"
+                            onClick={() => setIsEditingImage(!isEditingImage)}
+                        >
+                            {session.user.image ? (
+                                <img src={session.user.image} alt={session.user.name || "User"} className="w-full h-full object-cover" />
+                            ) : (
+                                session.user.name?.charAt(0).toUpperCase() ?? "U"
+                            )}
+                            <div className="absolute inset-0 bg-black/50 hidden group-hover:flex items-center justify-center transition-all">
+                                <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+                                </svg>
+                            </div>
+                        </div>
                     </div>
 
                     {/* Info */}
                     <div className="flex-1 space-y-4">
-                        <div>
-                            <p className="text-sm text-slate-500 dark:text-gray-500 mb-1">Full Name</p>
-                            <p className="text-xl font-semibold text-slate-900 dark:text-white">{session.user.name}</p>
-                        </div>
-                        <div>
-                            <p className="text-sm text-slate-500 dark:text-gray-500 mb-1">Email Address</p>
-                            <p className="text-lg text-slate-900 dark:text-white">{session.user.email}</p>
-                        </div>
+                        {isEditingImage ? (
+                            <div className="space-y-2">
+                                <p className="text-sm text-slate-500 dark:text-gray-500">Profile Image URL</p>
+                                <div className="flex gap-2">
+                                    <input 
+                                        type="text" 
+                                        value={imageUrl} 
+                                        onChange={(e) => setImageUrl(e.target.value)} 
+                                        placeholder="https://example.com/image.jpg"
+                                        className="flex-1 bg-slate-50 dark:bg-[#1a1a24] border border-slate-200 dark:border-white/10 rounded-xl px-4 py-2 text-sm text-slate-900 dark:text-white focus:outline-none focus:border-red-500"
+                                    />
+                                    <button 
+                                        onClick={handleUpdateImage}
+                                        disabled={isUpdating}
+                                        className="px-4 py-2 bg-red-600 hover:bg-red-500 text-white text-sm font-semibold rounded-xl transition-all disabled:opacity-50"
+                                    >
+                                        {isUpdating ? "Saving..." : "Save"}
+                                    </button>
+                                </div>
+                            </div>
+                        ) : (
+                            <>
+                                <div>
+                                    <p className="text-sm text-slate-500 dark:text-gray-500 mb-1">Full Name</p>
+                                    <p className="text-xl font-semibold text-slate-900 dark:text-white">{session.user.name}</p>
+                                </div>
+                                <div>
+                                    <p className="text-sm text-slate-500 dark:text-gray-500 mb-1">Email Address</p>
+                                    <p className="text-lg text-slate-900 dark:text-white">{session.user.email}</p>
+                                </div>
+                            </>
+                        )}
                     </div>
 
                     {/* Actions */}
