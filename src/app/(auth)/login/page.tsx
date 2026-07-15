@@ -108,20 +108,7 @@ export default function LoginPage() {
                         <p className="text-slate-500 dark:text-slate-400 text-sm mt-1">Sign in to your Gizmo account</p>
                     </div>
 
-                    {/* Demo Login Banner */}
-                    <div className="mb-6 p-4 rounded-2xl bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-500/8 dark:to-orange-500/8 border border-amber-200 dark:border-amber-500/20">
-                        <div className="flex items-start justify-between gap-3">
 
-                            <motion.button
-                                whileTap={{ scale: 0.96 }}
-                                type="button"
-                                onClick={handleDemoLogin}
-                                className="flex-shrink-0 px-3 py-2 text-xs font-bold text-amber-700 dark:text-amber-400 bg-amber-100 dark:bg-amber-500/15 hover:bg-amber-200 dark:hover:bg-amber-500/25 rounded-xl transition-all"
-                            >
-                                Auto‑fill
-                            </motion.button>
-                        </div>
-                    </div>
 
                     {/* Google */}
                     <motion.button
@@ -184,8 +171,8 @@ export default function LoginPage() {
                                 onBlur={() => handleBlur("email")}
                                 placeholder="you@example.com"
                                 className={`w-full px-4 py-3 bg-slate-50 dark:bg-white/5 border rounded-xl text-sm text-slate-900 dark:text-white placeholder-slate-400 outline-none transition-all ${touched.email && fieldErrors.email
-                                        ? "border-red-400 dark:border-red-500/60 focus:ring-2 focus:ring-red-500/20"
-                                        : "border-slate-200 dark:border-white/10 focus:border-red-500/50 focus:ring-2 focus:ring-red-500/15"
+                                    ? "border-red-400 dark:border-red-500/60 focus:ring-2 focus:ring-red-500/20"
+                                    : "border-slate-200 dark:border-white/10 focus:border-red-500/50 focus:ring-2 focus:ring-red-500/15"
                                     }`}
                             />
                             {touched.email && fieldErrors.email && (
@@ -211,8 +198,8 @@ export default function LoginPage() {
                                     onBlur={() => handleBlur("password")}
                                     placeholder="••••••••"
                                     className={`w-full px-4 py-3 pr-11 bg-slate-50 dark:bg-white/5 border rounded-xl text-sm text-slate-900 dark:text-white placeholder-slate-400 outline-none transition-all ${touched.password && fieldErrors.password
-                                            ? "border-red-400 dark:border-red-500/60 focus:ring-2 focus:ring-red-500/20"
-                                            : "border-slate-200 dark:border-white/10 focus:border-red-500/50 focus:ring-2 focus:ring-red-500/15"
+                                        ? "border-red-400 dark:border-red-500/60 focus:ring-2 focus:ring-red-500/20"
+                                        : "border-slate-200 dark:border-white/10 focus:border-red-500/50 focus:ring-2 focus:ring-red-500/15"
                                         }`}
                                 />
                                 <button type="button" onClick={() => setShowPass(v => !v)} className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors">
