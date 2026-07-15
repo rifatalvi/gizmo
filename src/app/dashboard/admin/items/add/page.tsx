@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { useRouter } from "next/navigation";
-import { productsApi } from "@/lib/api";
+import { addItem } from "@/app/items/actions";
 import {
     Upload,
     X,
@@ -84,19 +84,15 @@ export default function AddItemPage() {
         setErrorMsg("");
 
         try {
-            const formData = new FormData(e.currentTarget);
+            const formEl = e.currentTarget;
+            const formData = new FormData(formEl);
             const title = formData.get("title") as string;
-            const shortDescription = formData.get("shortDescription") as string;
-            const fullDescription = formData.get("fullDescription") as string;
-            const price = Number(formData.get("price"));
             let imageUrl = formData.get("imageUrl") as string;
 
             // 1. Upload to ImgBB if a file is selected
             if (imageFile) {
                 const imgbbApiKey = process.env.NEXT_PUBLIC_IMGBB_API_KEY;
-                if (!imgbbApiKey) {
-                    throw new Error("ImgBB API key is missing. Set NEXT_PUBLIC_IMGBB_API_KEY in .env");
-                }
+                if (!imgbbApiKey) throw new Error("ImgBB API key is missing.");
 
                 const imgFormData = new FormData();
                 imgFormData.append("image", imageFile);
@@ -105,7 +101,6 @@ export default function AddItemPage() {
                     method: "POST",
                     body: imgFormData,
                 });
-
                 const data = await res.json();
                 if (data.success) {
                     imageUrl = data.data.url;
@@ -114,29 +109,26 @@ export default function AddItemPage() {
                 }
             }
 
-            // 2. Submit to our products API
-            await productsApi.create({
-                name: title,
-                slug: title.toLowerCase().replace(/[^a-z0-9]+/g, "-"),
-                description: fullDescription,
-                category: shortDescription,
-                brand: "Gizmo",
-                price: price,
-                image: imageUrl || "https://via.placeholder.com/300",
-                rating: 0,
-                reviewCount: 0,
-                stock: 100,
-                tags: [title.toLowerCase()],
-                featured: false,
-            });
+            // 2. Build a FormData compatible with the addItem server action
+            const actionData = new FormData();
+            actionData.set("name", title);
+            actionData.set("category", formData.get("shortDescription") as string);
+            actionData.set("brand", "Gizmo");
+            actionData.set("description", formData.get("fullDescription") as string);
+            actionData.set("price", formData.get("price") as string);
+            actionData.set("stock", "100");
+            actionData.set("image", imageUrl || "");
 
-            // Show success feedback with a small delay for UX
-            await new Promise((resolve) => setTimeout(resolve, 600));
+            // 3. Call the server action — it reads the JWT cookie server-side
+            await addItem(actionData);
+
+            await new Promise((resolve) => setTimeout(resolve, 400));
             alert("✨ Item added successfully to Shop/Products!");
-            router.push("/dashboard/admin");
-        } catch (error: any) {
+            router.push("/dashboard/admin/items/manage");
+        } catch (error: unknown) {
+            const msg = error instanceof Error ? error.message : "Failed to add item";
             console.error(error);
-            setErrorMsg(error.message || "Failed to add item");
+            setErrorMsg(msg);
         } finally {
             setIsLoading(false);
         }

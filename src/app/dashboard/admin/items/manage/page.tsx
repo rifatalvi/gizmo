@@ -12,7 +12,8 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { productsApi, type Product } from "@/lib/api";
+import { getItems, deleteItem } from "@/app/items/actions";
+import type { Product } from "@/lib/api";
 import {
   Loader2,
   Trash2,
@@ -39,11 +40,13 @@ export default function ManageItemsPage() {
     setIsLoading(true);
     setErrorMsg("");
     try {
-      const data = await productsApi.list({ limit: "100" });
-      setProducts(data.products);
-    } catch (error: any) {
+      // getItems() is a server action — reads JWT cookie server-side
+      const data = await getItems();
+      setProducts(data as unknown as Product[]);
+    } catch (error: unknown) {
+      const msg = error instanceof Error ? error.message : "Failed to load products";
       console.error("Failed to fetch products:", error);
-      setErrorMsg(error.message || "Failed to load products");
+      setErrorMsg(msg);
     } finally {
       setIsLoading(false);
     }
@@ -58,11 +61,13 @@ export default function ManageItemsPage() {
 
     setDeletingId(id);
     try {
-      await productsApi.delete(id);
+      // deleteItem() is a server action — reads JWT cookie server-side
+      await deleteItem(id);
       setProducts(products.filter(p => p._id !== id));
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const msg = error instanceof Error ? error.message : "Failed to delete product";
       console.error("Failed to delete product:", error);
-      alert(error.message || "Failed to delete product");
+      alert(msg);
     } finally {
       setDeletingId(null);
     }
