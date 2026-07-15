@@ -211,24 +211,39 @@ export default function LoginPage() {
                             )}
                         </div>
 
-                        {/* Submit */}
-                        <motion.button
-                            whileTap={{ scale: 0.98 }}
-                            type="submit"
-                            id="login-submit"
-                            disabled={loading}
-                            className="w-full py-3.5 mt-2 font-bold text-white bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 rounded-2xl shadow-lg shadow-red-500/25 transition-all duration-200 disabled:opacity-60 disabled:cursor-not-allowed"
-                        >
-                            {loading ? (
-                                <span className="flex items-center justify-center gap-2">
-                                    <svg className="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
-                                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-                                    </svg>
-                                    Signing in…
-                                </span>
-                            ) : "Sign In"}
-                        </motion.button>
+                        {/* Demo Login & Submit */}
+                        <div className="flex flex-col sm:flex-row gap-3 pt-2">
+                            <motion.button
+                                whileTap={{ scale: 0.98 }}
+                                type="button"
+                                onClick={() => {
+                                    setEmail("admin@gizmo.com");
+                                    setPassword("Admin123!");
+                                    setFieldErrors({});
+                                    setTouched({});
+                                }}
+                                className="w-full sm:w-1/2 py-3.5 font-semibold text-slate-700 dark:text-slate-200 bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:hover:bg-white/10 border border-slate-200 dark:border-white/10 rounded-2xl transition-all duration-200"
+                            >
+                                Demo Login
+                            </motion.button>
+                            <motion.button
+                                whileTap={{ scale: 0.98 }}
+                                type="submit"
+                                id="login-submit"
+                                disabled={loading}
+                                className="w-full sm:w-1/2 py-3.5 font-bold text-white bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 rounded-2xl shadow-lg shadow-red-500/25 transition-all duration-200 disabled:opacity-60 disabled:cursor-not-allowed"
+                            >
+                                {loading ? (
+                                    <span className="flex items-center justify-center gap-2">
+                                        <svg className="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
+                                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                                        </svg>
+                                        Signing in…
+                                    </span>
+                                ) : "Sign In"}
+                            </motion.button>
+                        </div>
                     </form>
 
                     <p className="text-center text-sm text-slate-500 dark:text-slate-400 mt-6">
