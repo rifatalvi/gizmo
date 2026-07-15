@@ -67,10 +67,14 @@ export default function RegisterPage() {
         setError("");
         setLoading(true);
         try {
-            await signUp.email({ name, email, password });
-            router.push("/");
+            const result = await signUp.email({ name, email, password });
+            if (result.error) {
+                setError(result.error.message || "Registration failed. Please try again.");
+            } else {
+                router.push("/");
+            }
         } catch (err: unknown) {
-            setError(err instanceof Error ? err.message : "Registration failed. Please try again.");
+            setError(err instanceof Error ? err.message : "An unexpected error occurred. Please try again.");
         } finally {
             setLoading(false);
         }
@@ -79,7 +83,10 @@ export default function RegisterPage() {
     const handleGoogleSignup = async () => {
         setGoogleLoading(true);
         try {
-            await signIn.social({ provider: "google", callbackURL: "/" });
+            const result = await signIn.social({ provider: "google", callbackURL: "/" });
+            if (result.error) {
+                setError(result.error.message || "Google sign-up failed. Please try again.");
+            }
         } catch {
             setError("Google sign-up failed. Please try again.");
         } finally {
