@@ -25,6 +25,8 @@ const NAV_LOGGED_OUT = [
     { label: "Home", href: "/" },
     { label: "Shop", href: "/shop" },
     { label: "Deals", href: "/deals" },
+    { label: "About Us", href: "/about" },
+    { label: "Contact Us", href: "/contact" },
 ];
 
 const NAV_LOGGED_IN = [
@@ -33,6 +35,8 @@ const NAV_LOGGED_IN = [
     { label: "Deals", href: "/deals" },
     { label: "Orders", href: "/orders" },
     { label: "Wishlist", href: "/wishlist" },
+    { label: "About Us", href: "/about" },
+    { label: "Contact Us", href: "/contact" },
 ];
 
 export default function Navbar() {

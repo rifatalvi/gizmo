@@ -108,22 +108,7 @@ export default function LoginPage() {
                         <p className="text-slate-500 dark:text-slate-400 text-sm mt-1">Sign in to your Gizmo account</p>
                     </div>
 
-                    {/* Demo Login Banner */}
-                    <div className="mb-6 p-4 rounded-2xl bg-blue-50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-800/30">
-                        <div className="flex items-center justify-between">
-                            <div>
-                                <h3 className="text-sm font-semibold text-blue-900 dark:text-blue-400">Try Admin Demo</h3>
-                                <p className="text-xs text-blue-700 dark:text-blue-500 mt-0.5">Auto-fill credentials to explore</p>
-                            </div>
-                            <button
-                                type="button"
-                                onClick={handleDemoLogin}
-                                className="px-4 py-2 text-xs font-semibold bg-blue-600 hover:bg-blue-700 text-white rounded-xl transition-colors"
-                            >
-                                Fill Demo
-                            </button>
-                        </div>
-                    </div>
+
                     {/* Google */}
                     <motion.button
                         whileTap={{ scale: 0.98 }}

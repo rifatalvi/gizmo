@@ -61,11 +61,11 @@ export function OrderStatusSelect({ orderId, initialStatus }: Props) {
         <Dropdown>
             <Button
                 aria-label="Order Status"
-                variant="flat"
+                variant="ghost"
                 className={`px-3 py-1.5 text-xs font-semibold rounded-full capitalize w-[110px] justify-between ${STATUS_STYLES[currentStatus] || ""}`}
-                isLoading={isLoading}
+                isDisabled={isLoading}
             >
-                {currentStatus}
+                {isLoading ? "..." : currentStatus}
             </Button>
             <Dropdown.Popover className="min-w-[200px]">
                 <Dropdown.Menu
