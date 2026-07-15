@@ -153,7 +153,7 @@ export default function AddItemPage() {
                             <Package className="h-6 w-6 text-blue-600" strokeWidth={1.8} />
                         </div>
                         <div>
-                            <CardTitle className="text-3xl font-bold bg-gradient-to-r from-slate-800 to-slate-600 bg-clip-text text-transparent flex items-center gap-2">
+                            <CardTitle className="text-3xl font-bold bg-gradient-to-r from-slate-800 to-slate-600 dark:from-slate-100 dark:to-slate-300 bg-clip-text text-transparent flex items-center gap-2">
                                 Add New Item
                                 <Sparkles className="h-5 w-5 text-amber-400 fill-amber-400/30" strokeWidth={1.8} />
                             </CardTitle>
@@ -187,7 +187,7 @@ export default function AddItemPage() {
                                     name="title"
                                     placeholder="e.g. Premium Wireless Headphones"
                                     required
-                                    className="pl-4 py-6 text-base border-slate-200/80 bg-slate-50/50 focus:bg-white focus:border-blue-400 focus:ring-2 focus:ring-blue-200/50 transition-all duration-200 rounded-xl"
+                                    className="pl-4 py-6 text-base text-slate-900 dark:text-slate-100 border-slate-200/80 bg-slate-50/50 dark:bg-slate-800/50 focus:bg-white dark:focus:bg-slate-900 focus:border-blue-400 focus:ring-2 focus:ring-blue-200/50 transition-all duration-200 rounded-xl"
                                 />
                                 <div className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-slate-400 bg-slate-100 px-2 py-0.5 rounded-md font-medium">
                                     Required
@@ -207,7 +207,7 @@ export default function AddItemPage() {
                                     name="shortDescription"
                                     placeholder="e.g. Electronics"
                                     required
-                                    className="py-6 text-base border-slate-200/80 bg-slate-50/50 focus:bg-white focus:border-blue-400 focus:ring-2 focus:ring-blue-200/50 transition-all duration-200 rounded-xl"
+                                    className="py-6 text-base text-slate-900 dark:text-slate-100 border-slate-200/80 bg-slate-50/50 dark:bg-slate-800/50 focus:bg-white dark:focus:bg-slate-900 focus:border-blue-400 focus:ring-2 focus:ring-blue-200/50 transition-all duration-200 rounded-xl"
                                 />
                             </div>
 
@@ -226,7 +226,7 @@ export default function AddItemPage() {
                                         min="0"
                                         placeholder="0.00"
                                         required
-                                        className="pl-8 py-6 text-base border-slate-200/80 bg-slate-50/50 focus:bg-white focus:border-blue-400 focus:ring-2 focus:ring-blue-200/50 transition-all duration-200 rounded-xl"
+                                        className="pl-8 py-6 text-base text-slate-900 dark:text-slate-100 border-slate-200/80 bg-slate-50/50 dark:bg-slate-800/50 focus:bg-white dark:focus:bg-slate-900 focus:border-blue-400 focus:ring-2 focus:ring-blue-200/50 transition-all duration-200 rounded-xl"
                                     />
                                 </div>
                             </div>
@@ -242,7 +242,7 @@ export default function AddItemPage() {
                                 id="fullDescription"
                                 name="fullDescription"
                                 placeholder="Write a detailed description of your product..."
-                                className="flex min-h-[140px] w-full rounded-xl border border-slate-200/80 bg-slate-50/50 px-4 py-3.5 text-base shadow-sm placeholder:text-slate-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-200/50 focus-visible:border-blue-400 focus-visible:bg-white transition-all duration-200 resize-y"
+                                className="flex min-h-[140px] w-full rounded-xl border border-slate-200/80 bg-slate-50/50 dark:bg-slate-800/50 px-4 py-3.5 text-base text-slate-900 dark:text-slate-100 shadow-sm placeholder:text-slate-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-200/50 focus-visible:border-blue-400 focus-visible:bg-white dark:focus-visible:bg-slate-900 transition-all duration-200 resize-y"
                                 required
                             />
                             <p className="text-xs text-slate-400 flex items-center gap-1.5 mt-1">
@@ -328,7 +328,7 @@ export default function AddItemPage() {
                                 name="imageUrl"
                                 type="url"
                                 placeholder="https://example.com/image.jpg"
-                                className="pl-4 py-5.5 text-sm border-slate-200/80 bg-slate-50/50 focus:bg-white focus:border-blue-400 focus:ring-2 focus:ring-blue-200/50 transition-all duration-200 rounded-xl"
+                                className="pl-4 py-5.5 text-sm text-slate-900 dark:text-slate-100 border-slate-200/80 bg-slate-50/50 dark:bg-slate-800/50 focus:bg-white dark:focus:bg-slate-900 focus:border-blue-400 focus:ring-2 focus:ring-blue-200/50 transition-all duration-200 rounded-xl"
                             />
                         </div>
 

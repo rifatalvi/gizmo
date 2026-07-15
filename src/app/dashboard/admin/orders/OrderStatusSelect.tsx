@@ -108,7 +108,7 @@ export function OrderStatusSelect({ orderId, initialStatus }: Props) {
                         </Header>
 
                         {Object.entries(STATUS_LABELS).map(([id, label]) => {
-                            const isSelected = selected.has(id);
+                            const isSelected = selected === "all" || selected.has(id);
                             const colorClasses = STATUS_STYLES[id] || "";
                             // Extract background and text classes for the dot
                             const bgClass = colorClasses
@@ -124,7 +124,7 @@ export function OrderStatusSelect({ orderId, initialStatus }: Props) {
                                     id={id}
                                     textValue={label}
                                     className={`
-                    flex items-center gap-2 px-3 py-2 text-sm
+                    flex items-center gap-2 px-3 py-2 text-sm text-slate-900 dark:text-slate-100
                     hover:bg-default-100 dark:hover:bg-default-50
                     data-[highlighted]:bg-default-100 dark:data-[highlighted]:bg-default-50
                     transition-colors duration-150
