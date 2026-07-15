@@ -6,8 +6,6 @@ import { useRouter } from "next/navigation";
 import { signIn } from "@/lib/auth-client";
 import { motion } from "motion/react";
 
-const DEMO_EMAIL = "demo@gizmo.com";
-const DEMO_PASSWORD = "demo123456";
 
 type FieldError = { email?: string; password?: string };
 
