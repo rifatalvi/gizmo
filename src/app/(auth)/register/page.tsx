@@ -42,6 +42,8 @@ export default function RegisterPage() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [confirm, setConfirm] = useState("");
+    const [imageFile, setImageFile] = useState<File | null>(null);
+    const [imagePreview, setImagePreview] = useState<string | null>(null);
     const [showPass, setShowPass] = useState(false);
     const [showConfirm, setShowConfirm] = useState(false);
     const [loading, setLoading] = useState(false);
@@ -67,7 +69,7 @@ export default function RegisterPage() {
         setError("");
         setLoading(true);
         try {
-            const result = await signUp.email({ name, email, password });
+            const result = await signUp.email({ name, email, password, image: imagePreview || undefined });
             if (result.error) {
                 setError(result.error.message || "Registration failed. Please try again.");
             } else {
@@ -172,6 +174,43 @@ export default function RegisterPage() {
                     )}
 
                     <form onSubmit={handleSubmit} noValidate className="space-y-4">
+                        {/* Profile Image */}
+                        <div className="flex flex-col items-center justify-center mb-6 mt-2">
+                            <label htmlFor="reg-image" className="cursor-pointer relative group">
+                                <div className="w-20 h-20 rounded-full bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 flex items-center justify-center overflow-hidden">
+                                    {imagePreview ? (
+                                        <img src={imagePreview} alt="Profile" className="w-full h-full object-cover" />
+                                    ) : (
+                                        <svg className="w-8 h-8 text-slate-400 group-hover:text-red-500 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+                                        </svg>
+                                    )}
+                                </div>
+                                <div className="absolute inset-0 bg-black/40 rounded-full opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                    <span className="text-white text-[10px] font-medium">Upload</span>
+                                </div>
+                            </label>
+                            <input
+                                id="reg-image"
+                                type="file"
+                                accept="image/*"
+                                className="hidden"
+                                onChange={(e) => {
+                                    const file = e.target.files?.[0];
+                                    if (file) {
+                                        setImageFile(file);
+                                        const reader = new FileReader();
+                                        reader.onloadend = () => {
+                                            setImagePreview(reader.result as string);
+                                        };
+                                        reader.readAsDataURL(file);
+                                    }
+                                }}
+                            />
+                            <span className="text-xs text-slate-500 mt-2">Profile Picture (optional)</span>
+                        </div>
+
                         {/* Name */}
                         <div>
                             <label htmlFor="reg-name" className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1.5">Full Name</label>

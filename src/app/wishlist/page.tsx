@@ -4,11 +4,11 @@ import { useState } from "react";
 import Link from "next/link";
 import { useSession } from "@/lib/auth-client";
 import Footer from "@/component/Footer";
+import { useWishlist } from "@/components/WishlistContext";
 
-// Note: Wishlist uses localStorage for now. Connect to backend wishlist API later.
 export default function WishlistPage() {
     const { data: session } = useSession();
-    const [wishlist] = useState<{ name: string; price: number; image: string; id: string }[]>([]);
+    const { wishlist, toggleWishlist } = useWishlist();
 
     if (!session) return (
         <div className="min-h-screen bg-slate-50 dark:bg-[#0a0a0f] flex flex-col items-center justify-center gap-4">
@@ -39,14 +39,26 @@ export default function WishlistPage() {
                     </div>
                 ) : (
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                        {wishlist.map((item) => (
-                            <div key={item.id} className="bg-white dark:bg-[#111118] border border-slate-200 dark:border-white/5 rounded-2xl overflow-hidden">
-                                {/* eslint-disable-next-line @next/next/no-img-element */}
-                                <img src={item.image} alt={item.name} className="w-full h-40 object-cover" />
+                        {wishlist.map((item, index) => (
+                            <div key={item.productId || (item as any).id || index} className="relative bg-white dark:bg-[#111118] border border-slate-200 dark:border-white/5 rounded-2xl overflow-hidden group">
+                                <button
+                                    onClick={() => toggleWishlist({ _id: item.productId || (item as any).id, name: item.name, price: item.price, image: item.image } as any)}
+                                    className="absolute top-3 right-3 z-10 p-2 rounded-full bg-white/80 dark:bg-black/40 backdrop-blur-md shadow-sm hover:bg-white dark:hover:bg-black/60 transition-all duration-200"
+                                >
+                                    <svg className="w-4 h-4 text-rose-500 fill-rose-500" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                                    </svg>
+                                </button>
+                                <Link href={`/shop/${item.productId || (item as any).id}`} className="block">
+                                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                                    <img src={item.image} alt={item.name} className="w-full h-40 object-cover group-hover:scale-105 transition-transform duration-500" />
+                                </Link>
                                 <div className="p-4">
-                                    <p className="text-sm font-semibold text-slate-900 dark:text-white mb-1 line-clamp-2">{item.name}</p>
+                                    <Link href={`/shop/${item.productId || (item as any).id}`}>
+                                        <p className="text-sm font-semibold text-slate-900 dark:text-white mb-1 line-clamp-2 hover:text-red-500 transition-colors">{item.name}</p>
+                                    </Link>
                                     <p className="text-lg font-bold text-slate-900 dark:text-white">${item.price.toLocaleString()}</p>
-                                    <button className="mt-3 w-full py-2 text-sm font-semibold text-slate-900 dark:text-white bg-red-600 hover:bg-red-500 rounded-lg transition-all">Add to Cart</button>
+                                    <Link href={`/shop/${item.productId || (item as any).id}`} className="mt-3 flex items-center justify-center w-full py-2 text-sm font-semibold text-slate-900 dark:text-white bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:hover:bg-white/10 rounded-lg transition-all">View Product</Link>
                                 </div>
                             </div>
                         ))}

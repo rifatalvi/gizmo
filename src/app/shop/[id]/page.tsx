@@ -7,6 +7,7 @@ import ProductCard from "@/component/ProductCard";
 import Footer from "@/component/Footer";
 import { motion, AnimatePresence } from "motion/react";
 import { useCart } from "@/components/CartContext";
+import { useWishlist } from "@/components/WishlistContext";
 
 import { useParams } from "next/navigation";
 
@@ -21,8 +22,10 @@ export default function ProductDetailsPage() {
     const [addedToCart, setAddedToCart] = useState(false);
     const [buyingNow, setBuyingNow] = useState(false);
     const { items, addToCart } = useCart();
+    const { toggleWishlist, isInWishlist } = useWishlist();
 
     const isAlreadyAdded = product ? items.some(item => item.productId === product._id) : false;
+    const wishlisted = product ? isInWishlist(product._id) : false;
 
     useEffect(() => {
         const fetchProduct = async () => {
@@ -215,10 +218,15 @@ export default function ProductDetailsPage() {
 
                                 <motion.button
                                     whileTap={{ scale: 0.9 }}
-                                    className="flex-shrink-0 p-4 rounded-2xl bg-slate-50 dark:bg-white/5 hover:bg-slate-100 dark:hover:bg-white/10 text-slate-700 dark:text-white transition-colors border border-slate-200 dark:border-white/10"
-                                    title="Add to Wishlist"
+                                    onClick={() => product && toggleWishlist(product)}
+                                    className={`flex-shrink-0 p-4 rounded-2xl transition-colors border ${
+                                        wishlisted 
+                                            ? "bg-rose-50 dark:bg-rose-500/10 border-rose-200 dark:border-rose-500/20 text-rose-500" 
+                                            : "bg-slate-50 dark:bg-white/5 hover:bg-slate-100 dark:hover:bg-white/10 text-slate-700 dark:text-white border-slate-200 dark:border-white/10"
+                                    }`}
+                                    title={wishlisted ? "Remove from Wishlist" : "Add to Wishlist"}
                                 >
-                                    <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                                    <svg className={`w-6 h-6 transition-colors ${wishlisted ? "fill-rose-500 text-rose-500" : "fill-none text-currentColor"}`} stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
                                     </svg>
                                 </motion.button>

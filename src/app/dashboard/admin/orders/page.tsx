@@ -3,28 +3,21 @@ import { headers } from "next/headers";
 import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import type { Order } from "@/lib/api";
-
-const STATUS_STYLES: Record<string, string> = {
-    pending: "text-yellow-600 bg-yellow-100 dark:bg-yellow-900/30 dark:text-yellow-400",
-    processing: "text-blue-600 bg-blue-100 dark:bg-blue-900/30 dark:text-blue-400",
-    shipped: "text-purple-600 bg-purple-100 dark:bg-purple-900/30 dark:text-purple-400",
-    delivered: "text-green-600 bg-green-100 dark:bg-green-900/30 dark:text-green-400",
-    cancelled: "text-rose-600 bg-rose-100 dark:bg-rose-900/30 dark:text-rose-400",
-};
+import { OrderStatusSelect } from "./OrderStatusSelect";
 
 export default async function AdminOrdersPage() {
 
 
     const db = await getDb();
-    // For Completed Orders, we only want orders that have been paid for
+    // Fetch all orders so admin can update their status
     const orders = await db.collection<Order>("orders")
-        .find({ status: { $in: ['processing', 'shipped', 'delivered'] } })
+        .find({})
         .sort({ createdAt: -1 })
         .toArray();
 
     return (
         <div className="p-8">
-            <h1 className="text-2xl font-bold text-slate-900 dark:text-white mb-6">Completed Orders</h1>
+            <h1 className="text-2xl font-bold text-slate-900 dark:text-white mb-6">All Orders</h1>
             
             <div className="bg-white dark:bg-[#111118] border border-slate-200 dark:border-white/5 rounded-2xl overflow-hidden shadow-sm">
                 <div className="overflow-x-auto">
@@ -61,9 +54,7 @@ export default async function AdminOrdersPage() {
                                         ${order.total.toFixed(2)}
                                     </td>
                                     <td className="px-6 py-4">
-                                        <span className={`px-2 py-1 text-xs font-semibold rounded-full capitalize ${STATUS_STYLES[order.status]}`}>
-                                            {order.status}
-                                        </span>
+                                        <OrderStatusSelect orderId={String(order._id)} initialStatus={order.status} />
                                     </td>
                                     <td className="px-6 py-4 text-slate-500 dark:text-slate-400">
                                         {new Date(order.createdAt).toLocaleDateString()}
@@ -73,7 +64,7 @@ export default async function AdminOrdersPage() {
                             {orders.length === 0 && (
                                 <tr>
                                     <td colSpan={6} className="px-6 py-12 text-center text-slate-500">
-                                        No completed orders found.
+                                        No orders found.
                                     </td>
                                 </tr>
                             )}

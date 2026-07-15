@@ -30,6 +30,13 @@ export interface CartItem {
     quantity: number;
 }
 
+export interface WishlistItem {
+    productId: string;
+    name: string;
+    price: number;
+    image: string;
+}
+
 export interface Cart {
     userId: string;
     items: CartItem[];
@@ -78,12 +85,23 @@ export const cartApi = {
         apiFetch<{ success: boolean }>(`/api/cart/${userId}`, { method: 'DELETE' }),
 };
 
+// ── Wishlist ────────────────────────────────────────────────────────
+export const wishlistApi = {
+    get: (userId: string) => apiFetch<{ userId: string, items: WishlistItem[] }>(`/api/wishlists/${userId}`),
+    addItem: (userId: string, item: WishlistItem) =>
+        apiFetch<{ userId: string, items: WishlistItem[] }>(`/api/wishlists/${userId}`, { method: 'POST', body: JSON.stringify(item) }),
+    removeItem: (userId: string, productId: string) =>
+        apiFetch<{ userId: string, items: WishlistItem[] }>(`/api/wishlists/${userId}/${productId}`, { method: 'DELETE' }),
+};
+
 // ── Orders ────────────────────────────────────────────────────────
 export const ordersApi = {
     list: (userId: string) => apiFetch<Order[]>(`/api/orders/user/${userId}`),
     get: (id: string) => apiFetch<Order>(`/api/orders/${id}`),
     place: (order: Omit<Order, '_id' | 'createdAt' | 'status'>) =>
         apiFetch<Order>('/api/orders', { method: 'POST', body: JSON.stringify(order) }),
+    updateStatus: (id: string, status: string) =>
+        apiFetch<{ success: boolean }>(`/api/orders/${id}/status`, { method: 'PATCH', body: JSON.stringify({ status }) }),
 };
 
 // ── Checkout ───────────────────────────────────────────────────────

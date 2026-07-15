@@ -4,10 +4,17 @@ import { useSession, signOut } from "@/lib/auth-client";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Footer from "@/component/Footer";
+import { useEffect } from "react";
 
 export default function ProfilePage() {
     const { data: session, isPending } = useSession();
     const router = useRouter();
+
+    useEffect(() => {
+        if (!isPending && !session) {
+            router.push("/login");
+        }
+    }, [isPending, session, router]);
 
     if (isPending) {
         return (
@@ -23,7 +30,6 @@ export default function ProfilePage() {
     }
 
     if (!session) {
-        router.push("/login");
         return null;
     }
 

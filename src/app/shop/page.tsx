@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, Suspense } from "react";
+import { useSearchParams, useRouter } from "next/navigation";
 import { productsApi, type Product } from "@/lib/api";
 import ProductCard from "@/component/ProductCard";
 import Footer from "@/component/Footer";
@@ -91,7 +92,6 @@ function PaginationBar({
             </p>
 
             <div className="flex items-center gap-1.5">
-                {/* Prev */}
                 <button
                     onClick={() => onPage(page - 1)}
                     disabled={page === 1}
@@ -103,7 +103,6 @@ function PaginationBar({
                     Previous
                 </button>
 
-                {/* Pages */}
                 <div className="flex items-center gap-1">
                     {getPages().map((p, i) =>
                         p === "ellipsis" ? (
@@ -124,7 +123,6 @@ function PaginationBar({
                     )}
                 </div>
 
-                {/* Next */}
                 <button
                     onClick={() => onPage(page + 1)}
                     disabled={page === totalPages}
@@ -140,7 +138,10 @@ function PaginationBar({
     );
 }
 
-export default function ShopPage() {
+function ShopContent() {
+    const searchParams = useSearchParams();
+    const router = useRouter();
+
     const [products, setProducts] = useState<Product[]>([]);
     const [total, setTotal] = useState(0);
     const [totalPages, setTotalPages] = useState(1);
@@ -148,12 +149,40 @@ export default function ShopPage() {
 
     const [search, setSearch] = useState("");
     const [debouncedSearch, setDebouncedSearch] = useState("");
-    const [category, setCategory] = useState("all");
+    const [category, setCategory] = useState(() => {
+        // Cannot read searchParams here on server, will be set in effect
+        return "all";
+    });
     const [priceRange, setPriceRange] = useState(PRICE_RANGES[0]);
     const [minRating, setMinRating] = useState(0);
     const [sortBy, setSortBy] = useState("newest");
     const [page, setPage] = useState(1);
     const [filtersOpen, setFiltersOpen] = useState(false);
+
+    // Initialize filters from URL query params (runs once on mount)
+    useEffect(() => {
+        const urlCat = searchParams.get("category");
+        if (urlCat && CATEGORIES.includes(urlCat.toLowerCase())) setCategory(urlCat.toLowerCase());
+
+        const urlSearch = searchParams.get("search");
+        if (urlSearch) { setSearch(urlSearch); setDebouncedSearch(urlSearch); }
+
+        const urlSort = searchParams.get("sort");
+        if (urlSort && SORT_OPTIONS.some(o => o.value === urlSort)) setSortBy(urlSort);
+
+        const urlPrice = searchParams.get("priceRange");
+        if (urlPrice) {
+            const found = PRICE_RANGES.find(r => r.label === urlPrice);
+            if (found) setPriceRange(found);
+        }
+
+        const urlRating = searchParams.get("minRating");
+        if (urlRating) setMinRating(parseFloat(urlRating));
+
+        const urlPage = searchParams.get("page");
+        if (urlPage) setPage(parseInt(urlPage, 10));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []); // intentionally only on mount
 
     // Debounce search
     useEffect(() => {
@@ -166,7 +195,20 @@ export default function ShopPage() {
         setPage(1);
     }, [debouncedSearch, category, priceRange, minRating, sortBy]);
 
-    // Fetch from MongoDB API — all filtering/sorting/pagination done server-side
+    // Sync filter state → URL (so address bar stays up to date)
+    useEffect(() => {
+        const params = new URLSearchParams();
+        if (debouncedSearch) params.set("search", debouncedSearch);
+        if (category !== "all") params.set("category", category);
+        if (sortBy !== "newest") params.set("sort", sortBy);
+        if (priceRange !== PRICE_RANGES[0]) params.set("priceRange", priceRange.label);
+        if (minRating > 0) params.set("minRating", String(minRating));
+        if (page > 1) params.set("page", String(page));
+        const qs = params.toString();
+        router.replace(qs ? `/shop?${qs}` : "/shop", { scroll: false });
+    }, [debouncedSearch, category, sortBy, priceRange, minRating, page]);
+
+    // Fetch from MongoDB API
     const fetchProducts = useCallback(async () => {
         setLoading(true);
         try {
@@ -418,5 +460,17 @@ export default function ShopPage() {
 
             <Footer />
         </div>
+    );
+}
+
+export default function ShopPage() {
+    return (
+        <Suspense fallback={
+            <div className="min-h-screen bg-slate-50 dark:bg-[#0a0a0f] pt-24 pb-12 flex justify-center">
+                <div className="w-8 h-8 border-4 border-red-500 border-t-transparent rounded-full animate-spin" />
+            </div>
+        }>
+            <ShopContent />
+        </Suspense>
     );
 }

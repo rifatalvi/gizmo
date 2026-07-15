@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useState } from "react";
 import type { Product } from "@/lib/api";
 import { useCart } from "@/components/CartContext";
+import { useWishlist } from "@/components/WishlistContext";
 
 interface ProductCardProps {
     product: Product;
@@ -37,11 +38,12 @@ const CATEGORY_COLORS: Record<string, string> = {
 };
 
 export default function ProductCard({ product, onAddToCart, onWishlist }: ProductCardProps) {
-    const [wishlisted, setWishlisted] = useState(false);
     const [addedToCart, setAddedToCart] = useState(false);
     const { items, addToCart } = useCart();
+    const { toggleWishlist, isInWishlist } = useWishlist();
 
     const isAlreadyAdded = items.some(item => item.productId === product._id);
+    const wishlisted = isInWishlist(product._id);
 
     const handleAddToCart = async (e: React.MouseEvent) => {
         e.preventDefault();
@@ -57,7 +59,7 @@ export default function ProductCard({ product, onAddToCart, onWishlist }: Produc
     const handleWishlist = (e: React.MouseEvent) => {
         e.preventDefault();
         e.stopPropagation();
-        setWishlisted((v) => !v);
+        toggleWishlist(product);
         onWishlist?.(product);
     };
 
