@@ -1,6 +1,7 @@
 "use client"
 
 import { Calendar, Home, Inbox, Search, Settings, Plus, List } from "lucide-react"
+import Link from "next/link"
 
 import {
   Sidebar,
@@ -47,11 +48,9 @@ export function AppSidebar() {
             <SidebarMenu>
               {items.map((item) => (
                 <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild>
-                    <a href={item.url}>
+                  <SidebarMenuButton render={<Link href={item.url} />}>
                       <item.icon />
                       <span>{item.title}</span>
-                    </a>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}

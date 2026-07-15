@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { motion, AnimatePresence, useScroll, useTransform } from "motion/react";
+import { motion, AnimatePresence, useScroll, useTransform, type Variants } from "motion/react";
 import { useEffect, useState, useRef } from "react";
 
 const TYPING_WORDS = ["Delivered fast.", "At best prices.", "With top brands.", "All in one place."];
@@ -127,7 +127,7 @@ function useTypewriter(words: string[], speed = 75, pause = 2000) {
     return text;
 }
 
-const fadeUp = {
+const fadeUp: Variants = {
     hidden: { opacity: 0, y: 40 },
     visible: (i = 0) => ({ opacity: 1, y: 0, transition: { duration: 0.6, delay: i * 0.15, ease: "easeOut" } }),
 };
