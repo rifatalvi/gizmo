@@ -23,8 +23,8 @@ function getSecretKey() {
 export async function proxy(request: NextRequest) {
     const { pathname } = request.nextUrl;
 
-    // Only protect /items/* paths
-    if (!pathname.startsWith("/items")) {
+    // Only protect /items/* and /dashboard/admin/items/* paths
+    if (!pathname.startsWith("/items") && !pathname.startsWith("/dashboard/admin/items")) {
         return NextResponse.next();
     }
 
@@ -46,6 +46,6 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = {
-    // Match /items and all sub-paths
-    matcher: ["/items/:path*"],
+    // Match /items and /dashboard/admin/items sub-paths
+    matcher: ["/items/:path*", "/dashboard/admin/items/:path*"],
 };
