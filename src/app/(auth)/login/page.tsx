@@ -34,12 +34,7 @@ export default function LoginPage() {
         setFieldErrors(validate(email, password));
     };
 
-    const handleDemoLogin = () => {
-        setEmail(DEMO_EMAIL);
-        setPassword(DEMO_PASSWORD);
-        setFieldErrors({});
-        setError("");
-    };
+
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
