@@ -1,4 +1,4 @@
-import { GoogleGenAI } from "@google/genai";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
@@ -10,7 +10,7 @@ export async function POST(req: Request) {
     );
   }
 
-  const ai = new GoogleGenAI({ apiKey });
+  const genAI = new GoogleGenerativeAI(apiKey);
 
   try {
     const { messages } = await req.json();
@@ -23,12 +23,12 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "No user message found" }, { status: 400 });
     }
 
-    const response = await ai.models.generateContent({
-      model: "gemini-1.5-flash",
-      contents: lastUserMessage.content,
-    });
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    const result = await model.generateContent(lastUserMessage.content);
+    const response = await result.response;
+    const text = response.text();
 
-    return NextResponse.json({ text: response.text });
+    return NextResponse.json({ text });
   } catch (error: any) {
     console.error("Chat API Error details:", error);
     return NextResponse.json(
