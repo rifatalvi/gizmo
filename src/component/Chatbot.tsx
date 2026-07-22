@@ -46,9 +46,10 @@ export default function Chatbot() {
       if (response.ok) {
         setMessages((prev) => [...prev, { role: "model", content: data.text }]);
       } else {
+        const errorMessage = data.details ? `${data.error}: ${data.details}` : (data.error || "Sorry, I encountered an error.");
         setMessages((prev) => [
           ...prev,
-          { role: "model", content: data.error || "Sorry, I encountered an error." },
+          { role: "model", content: errorMessage },
         ]);
       }
     } catch (error) {

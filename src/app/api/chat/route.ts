@@ -1,17 +1,16 @@
 import { GoogleGenAI } from "@google/genai";
 import { NextResponse } from "next/server";
 
-// We check if API key exists. If not, the component will handle it, but we shouldn't crash here.
-const apiKey = process.env.GEMINI_API_KEY;
-const ai = apiKey ? new GoogleGenAI({ apiKey }) : null;
-
 export async function POST(req: Request) {
-  if (!ai) {
+  const apiKey = process.env.GEMINI_API_KEY;
+  if (!apiKey) {
     return NextResponse.json(
       { error: "GEMINI_API_KEY is not configured in .env" },
       { status: 500 }
     );
   }
+
+  const ai = new GoogleGenAI({ apiKey });
 
   try {
     const { messages } = await req.json();
@@ -30,10 +29,13 @@ export async function POST(req: Request) {
     });
 
     return NextResponse.json({ text: response.text });
-  } catch (error) {
-    console.error("Chat API Error:", error);
+  } catch (error: any) {
+    console.error("Chat API Error details:", error);
     return NextResponse.json(
-      { error: "Failed to generate response from Gemini" },
+      { 
+        error: "Failed to generate response from Gemini", 
+        details: error.message || String(error)
+      },
       { status: 500 }
     );
   }
