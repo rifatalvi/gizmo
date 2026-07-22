@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { ordersApi } from "@/lib/api";
 import type { Selection } from "@heroui/react";
@@ -51,6 +51,10 @@ export function OrderStatusSelect({ orderId, initialStatus }: Props) {
     const router = useRouter();
     const [selected, setSelected] = useState<Selection>(new Set([initialStatus]));
     const [isLoading, setIsLoading] = useState(false);
+
+    useEffect(() => {
+        setSelected(new Set([initialStatus]));
+    }, [initialStatus]);
 
     const handleSelectionChange = async (keys: Selection) => {
         setSelected(keys);
