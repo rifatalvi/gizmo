@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { ordersApi } from "@/lib/api";
 import type { Selection } from "@heroui/react";
-import { Button, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Spinner } from "@heroui/react";
+import { Button, Dropdown, Header, Label, Spinner } from "@heroui/react";
 
 // Light mode: black text + coloured background
 // Dark mode: coloured text + dimmed background
@@ -78,76 +78,82 @@ export function OrderStatusSelect({ orderId, initialStatus }: Props) {
 
     return (
         <Dropdown>
-            <DropdownTrigger>
-                <Button
-                    aria-label="Order Status"
-                    variant="ghost"
-                    className={`
-            px-3 py-1.5 text-xs font-semibold rounded-full capitalize 
-            w-[110px] justify-between transition-all duration-200
-            hover:scale-105 active:scale-95
-            ${STATUS_STYLES[currentStatus] || ""}
-            ${isLoading ? "opacity-60 pointer-events-none" : ""}
-            `}
-                    isDisabled={isLoading}
-                >
-                    {isLoading ? (
-                        <span className="flex items-center gap-1">
-                            <Spinner size="sm" color="current" />
-                            <span>Updating…</span>
-                        </span>
-                    ) : (
-                        STATUS_LABELS[currentStatus] || currentStatus
-                    )}
-                </Button>
-            </DropdownTrigger>
-
-            <DropdownMenu
-                aria-label="Update Status"
-                selectedKeys={selected}
-                selectionMode="single"
-                onSelectionChange={handleSelectionChange}
-                className="min-w-[200px]"
+            <Button
+                aria-label="Order Status"
+                variant="ghost"
+                className={`
+          px-3 py-1.5 text-xs font-semibold rounded-full capitalize 
+          w-[110px] justify-between transition-all duration-200
+          hover:scale-105 active:scale-95
+          ${STATUS_STYLES[currentStatus] || ""}
+          ${isLoading ? "opacity-60 pointer-events-none" : ""}
+        `}
+                isDisabled={isLoading}
             >
-                {Object.entries(STATUS_LABELS).map(([id, label]) => {
-                    const isSelected = selected === "all" || selected.has(id);
-                    const colorClasses = STATUS_STYLES[id] || "";
-                    // Extract background and text classes for the dot
-                    const bgClass = colorClasses
-                        .split(" ")
-                        .find((c) => c.startsWith("bg-") || c.startsWith("dark:bg-"));
+                {isLoading ? (
+                    <span className="flex items-center gap-1">
+                        <Spinner size="sm" color="current" />
+                        <span>Updating…</span>
+                    </span>
+                ) : (
+                    STATUS_LABELS[currentStatus] || currentStatus
+                )}
+            </Button>
 
-                    return (
-                        <DropdownItem
-                            key={id}
-                            textValue={label}
-                            className={`
-                        flex items-center gap-2 px-3 py-2 text-sm text-slate-900 dark:text-slate-100
-                        hover:bg-default-100 dark:hover:bg-default-50
-                        data-[highlighted]:bg-default-100 dark:data-[highlighted]:bg-default-50
-                        transition-colors duration-150
-                        ${isSelected ? "bg-default-200/50 dark:bg-default-100/30" : ""}
-                    `}
-                        >
-                            <div className="flex items-center justify-between w-full">
-                                <div className="flex items-center gap-2">
-                                    <span className="w-5 h-5 flex items-center justify-center">
-                                        {isSelected ? CustomCheckmarkIcon : null}
-                                    </span>
-                                    <span>{label}</span>
-                                </div>
-                                {/* Status colour indicator dot */}
-                                <span
+            <Dropdown.Popover className="min-w-[200px]">
+                <Dropdown.Menu
+                    selectedKeys={selected}
+                    selectionMode="single"
+                    onSelectionChange={handleSelectionChange}
+                >
+                    <Dropdown.Section>
+                        <Header className="px-3 py-2 text-xs font-medium text-muted-foreground border-b border-divider">
+                            Update Status
+                        </Header>
+
+                        {Object.entries(STATUS_LABELS).map(([id, label]) => {
+                            const isSelected = selected === "all" || selected.has(id);
+                            const colorClasses = STATUS_STYLES[id] || "";
+                            // Extract background and text classes for the dot
+                            const bgClass = colorClasses
+                                .split(" ")
+                                .find((c) => c.startsWith("bg-") || c.startsWith("dark:bg-"));
+                            const textClass = colorClasses
+                                .split(" ")
+                                .find((c) => c.startsWith("text-") || c.startsWith("dark:text-"));
+
+                            return (
+                                <Dropdown.Item
+                                    key={id}
+                                    id={id}
+                                    textValue={label}
                                     className={`
-                                w-2.5 h-2.5 rounded-full flex-shrink-0
-                                ${bgClass || "bg-gray-300 dark:bg-gray-600"}
-                                `}
-                                />
-                            </div>
-                        </DropdownItem>
-                    );
-                })}
-            </DropdownMenu>
+                    flex items-center gap-2 px-3 py-2 text-sm text-slate-900 dark:text-slate-100
+                    hover:bg-default-100 dark:hover:bg-default-50
+                    data-[highlighted]:bg-default-100 dark:data-[highlighted]:bg-default-50
+                    transition-colors duration-150
+                    ${isSelected ? "bg-default-200/50 dark:bg-default-100/30" : ""}
+                  `}
+                                >
+                                    <Dropdown.ItemIndicator className="w-5 h-5 flex items-center justify-center">
+                                        {isSelected ? CustomCheckmarkIcon : null}
+                                    </Dropdown.ItemIndicator>
+
+                                    <span className="flex-1">{label}</span>
+
+                                    {/* Status colour indicator dot */}
+                                    <span
+                                        className={`
+                      w-2.5 h-2.5 rounded-full flex-shrink-0
+                      ${bgClass || "bg-gray-300 dark:bg-gray-600"}
+                    `}
+                                    />
+                                </Dropdown.Item>
+                            );
+                        })}
+                    </Dropdown.Section>
+                </Dropdown.Menu>
+            </Dropdown.Popover>
         </Dropdown>
     );
 }
